@@ -43,3 +43,5 @@ vcpkg_installed/
 *.exe
 *.out
 *.app
+
+proj/

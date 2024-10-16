@@ -79,6 +79,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
+set(CMAKE_CUDA_ARCHITECTURES "89") # 40x0
+# set(CMAKE_CUDA_ARCHITECTURES "86") # 30x0
+
 set_property(GLOBAL PROPERTY GLOBAL_DEPENDS_NO_CYCLES ON)
 
 ################################################################################
