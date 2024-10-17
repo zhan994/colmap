@@ -118,6 +118,7 @@ struct SiftExtractionOptions {
 // context must be made current in the thread of the caller. If the gpu_index is
 // not -1, the CUDA version of SiftGPU is used, which produces slightly
 // different results than the OpenGL implementation.
+// api: 创建特征提取器
 std::unique_ptr<FeatureExtractor> CreateSiftFeatureExtractor(
     const SiftExtractionOptions& options);
 

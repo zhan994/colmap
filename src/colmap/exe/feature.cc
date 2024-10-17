@@ -97,6 +97,7 @@ void UpdateImageReaderOptionsFromCameraMode(ImageReaderOptions& options,
 }
 
 int RunFeatureExtractor(int argc, char** argv) {
+  // step: 1 options
   std::string image_list_path;
   int camera_mode = -1;
   std::string descriptor_normalization = "l1_root";
@@ -158,6 +159,7 @@ int RunFeatureExtractor(int argc, char** argv) {
     app.reset(new QApplication(argc, argv));
   }
 
+  // step: 2 创建特征提取控制器并运行
   auto feature_extractor = CreateFeatureExtractorController(
       reader_options, *options.sift_extraction);
 
@@ -297,6 +299,7 @@ int RunMatchesImporter(int argc, char** argv) {
 }
 
 int RunSequentialMatcher(int argc, char** argv) {
+  // step: 1 options
   OptionManager options;
   options.AddDatabaseOptions();
   options.AddSequentialMatchingOptions();
@@ -311,6 +314,7 @@ int RunSequentialMatcher(int argc, char** argv) {
     app.reset(new QApplication(argc, argv));
   }
 
+  // step: 2 创建seq match控制器并运行
   auto matcher = CreateSequentialFeatureMatcher(*options.sequential_matching,
                                                 *options.sift_matching,
                                                 *options.two_view_geometry,

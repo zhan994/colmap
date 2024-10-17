@@ -70,12 +70,14 @@ class FeatureMatcher {
 };
 
 // Cache for feature matching to minimize database access during matching.
+// api: 特征匹配数据缓存类，减轻database获取压力
 class FeatureMatcherCache {
  public:
   FeatureMatcherCache(size_t cache_size,
                       std::shared_ptr<Database> database,
                       bool do_setup = false);
 
+  // api: 设置特征匹配数据缓存
   void Setup();
 
   const Camera& GetCamera(camera_t camera_id) const;

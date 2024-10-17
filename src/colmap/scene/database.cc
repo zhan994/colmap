@@ -43,6 +43,7 @@ void SwapFeatureMatchesBlob(FeatureMatchesBlob* matches) {
   matches->col(0).swap(matches->col(1));
 }
 
+// api: FeatureKeypoints -> FeatureKeypointsBlob
 FeatureKeypointsBlob FeatureKeypointsToBlob(const FeatureKeypoints& keypoints) {
   const FeatureKeypointsBlob::Index kNumCols = 6;
   FeatureKeypointsBlob blob(keypoints.size(), kNumCols);
@@ -171,6 +172,7 @@ MatrixType ReadDynamicMatrixBlob(sqlite3_stmt* sql_stmt,
   return matrix;
 }
 
+// api: 自动将静态matrix转为sql格式写入
 template <typename MatrixType>
 void WriteStaticMatrixBlob(sqlite3_stmt* sql_stmt,
                            const MatrixType& matrix,
@@ -183,6 +185,7 @@ void WriteStaticMatrixBlob(sqlite3_stmt* sql_stmt,
       SQLITE_STATIC));
 }
 
+// api: 自动将动态matrix转为sql格式写入
 template <typename MatrixType>
 void WriteDynamicMatrixBlob(sqlite3_stmt* sql_stmt,
                             const MatrixType& matrix,

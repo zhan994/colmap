@@ -46,6 +46,7 @@ void PrintElapsedTime(const Timer& timer) {
   LOG(INFO) << StringPrintf(" in %.3fs", timer.ElapsedSeconds());
 }
 
+// api: 特征匹配模板类，包含控制器对象
 template <typename DerivedPairGenerator>
 class GenericFeatureMatcher : public Thread {
  public:
@@ -70,12 +71,15 @@ class GenericFeatureMatcher : public Thread {
     Timer run_timer;
     run_timer.Start();
 
+    // step: 1 特征匹配控制器设置
     if (!matcher_.Setup()) {
       return;
     }
 
+    // step: 2 FeatureMatcherCache设置
     cache_->Setup();
 
+    // step: 3 图像对生成器结合匹配控制器进行Match
     DerivedPairGenerator pair_generator(pair_options_, cache_);
     while (!pair_generator.HasFinished()) {
       if (IsStopped()) {
@@ -84,9 +88,11 @@ class GenericFeatureMatcher : public Thread {
       }
       Timer timer;
       timer.Start();
+      // step: 3.1 获取图像对数据列表
       const std::vector<std::pair<image_t, image_t>> image_pairs =
           pair_generator.Next();
       DatabaseTransaction database_transaction(database_.get());
+      // step: 3.2 特征匹配控制器进行Match
       matcher_.Match(image_pairs);
       PrintElapsedTime(timer);
     }
@@ -96,7 +102,7 @@ class GenericFeatureMatcher : public Thread {
   const typename DerivedPairGenerator::PairOptions pair_options_;
   const std::shared_ptr<Database> database_;
   const std::shared_ptr<FeatureMatcherCache> cache_;
-  FeatureMatcherController matcher_;
+  FeatureMatcherController matcher_; // 特征匹配控制器
 };
 
 }  // namespace

@@ -36,6 +36,7 @@
 namespace colmap {
 
 // Reads images from a folder, extracts features, and writes them to database.
+// api: 创建特征提取控制器线程
 std::unique_ptr<Thread> CreateFeatureExtractorController(
     const ImageReaderOptions& reader_options,
     const SiftExtractionOptions& sift_options);

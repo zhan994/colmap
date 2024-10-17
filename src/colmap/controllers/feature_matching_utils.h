@@ -50,6 +50,7 @@ struct FeatureMatcherData {
   TwoViewGeometry two_view_geometry;
 };
 
+// api: 特征匹配工作线程类
 class FeatureMatcherWorker : public Thread {
  public:
   typedef FeatureMatcherData Input;
@@ -90,6 +91,7 @@ class FeatureMatcherWorker : public Thread {
 // performance of the matching by taking advantage of caching and database
 // transactions, pass multiple images to the `Match` function. Note that the
 // database should be in an active transaction while calling `Match`.
+// api: 特征匹配控制器类
 class FeatureMatcherController {
  public:
   FeatureMatcherController(
@@ -101,9 +103,11 @@ class FeatureMatcherController {
   ~FeatureMatcherController();
 
   // Setup the matchers and return if successful.
+  // api: 设置特征匹配控制器
   bool Setup();
 
   // Match one batch of multiple image pairs.
+  // api: 匹配一批/组图像对数据
   void Match(const std::vector<std::pair<image_t, image_t>>& image_pairs);
 
  private:

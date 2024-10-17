@@ -93,6 +93,8 @@ std::unique_ptr<Thread> CreateVocabTreeFeatureMatcher(
 // Invoke loop detection if `(i mod loop_detection_period) == 0`, retrieve
 // most similar `loop_detection_num_images` images from vocabulary tree,
 // and perform matching and verification.
+// api: 创建序列特征匹配控制器线程
+// note: 前后overlap，按名字升序
 std::unique_ptr<Thread> CreateSequentialFeatureMatcher(
     const SequentialMatchingOptions& options,
     const SiftMatchingOptions& matching_options,

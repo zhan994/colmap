@@ -33,7 +33,7 @@
 #include "colmap/sensor/bitmap.h"
 
 namespace colmap {
-
+// api: 特征提取基类
 class FeatureExtractor {
  public:
   virtual ~FeatureExtractor() = default;

@@ -41,7 +41,7 @@
 
 namespace colmap {
 namespace {
-
+// api: 特征点恢复尺度
 void ScaleKeypoints(const Bitmap& bitmap,
                     const Camera& camera,
                     FeatureKeypoints* keypoints) {
@@ -55,6 +55,7 @@ void ScaleKeypoints(const Bitmap& bitmap,
   }
 }
 
+// api: 特征点mask
 void MaskKeypoints(const Bitmap& mask,
                    FeatureKeypoints* keypoints,
                    FeatureDescriptors* descriptors) {
@@ -83,19 +84,22 @@ void MaskKeypoints(const Bitmap& mask,
   descriptors->conservativeResize(out_index, descriptors->cols());
 }
 
+// api: ImageData数据结构体
 struct ImageData {
+  // 数据状态
   ImageReader::Status status = ImageReader::Status::FAILURE;
 
-  Camera camera;
-  Image image;
-  PosePrior pose_prior;
-  Bitmap bitmap;
+  Camera camera;         // 相机参数
+  Image image;           // 图像信息
+  PosePrior pose_prior;  // 先验pose
+  Bitmap bitmap;         // freeimage数据
   Bitmap mask;
 
-  FeatureKeypoints keypoints;
-  FeatureDescriptors descriptors;
+  FeatureKeypoints keypoints;      // 多level的特征点
+  FeatureDescriptors descriptors;  // 多level的描述子
 };
 
+// api: 图像降采样线程类
 class ImageResizerThread : public Thread {
  public:
   ImageResizerThread(int max_image_size,
@@ -117,6 +121,7 @@ class ImageResizerThread : public Thread {
         auto& image_data = input_job.Data();
 
         if (image_data.status == ImageReader::Status::SUCCESS) {
+          // step: 图像大小超过max_image_size_时，resize到目标大小
           if (static_cast<int>(image_data.bitmap.Width()) > max_image_size_ ||
               static_cast<int>(image_data.bitmap.Height()) > max_image_size_) {
             // Fit the down-sampled version exactly into the max dimensions.
@@ -145,6 +150,7 @@ class ImageResizerThread : public Thread {
   JobQueue<ImageData>* output_queue_;
 };
 
+// api: 特征提取线程类
 class SiftFeatureExtractorThread : public Thread {
  public:
   SiftFeatureExtractorThread(const SiftExtractionOptions& sift_options,
@@ -172,7 +178,7 @@ class SiftFeatureExtractorThread : public Thread {
       THROW_CHECK(opengl_context_->MakeCurrent());
 #endif
     }
-
+    // step: 1 创建提取器
     std::unique_ptr<FeatureExtractor> extractor =
         CreateSiftFeatureExtractor(sift_options_);
     if (extractor == nullptr) {
@@ -183,6 +189,7 @@ class SiftFeatureExtractorThread : public Thread {
 
     SignalValidSetup();
 
+    // step: 2 线程工作循环
     while (true) {
       if (IsStopped()) {
         break;
@@ -193,11 +200,15 @@ class SiftFeatureExtractorThread : public Thread {
         auto& image_data = input_job.Data();
 
         if (image_data.status == ImageReader::Status::SUCCESS) {
+          // step: 2.1 提取特征
           if (extractor->Extract(image_data.bitmap,
                                  &image_data.keypoints,
                                  &image_data.descriptors)) {
+            // step: 2.2 尺度恢复
             ScaleKeypoints(
                 image_data.bitmap, image_data.camera, &image_data.keypoints);
+
+            // step: 2.3 mask特征点
             if (camera_mask_) {
               MaskKeypoints(*camera_mask_,
                             &image_data.keypoints,
@@ -231,6 +242,7 @@ class SiftFeatureExtractorThread : public Thread {
   JobQueue<ImageData>* output_queue_;
 };
 
+// api: 特征输出线程类
 class FeatureWriterThread : public Thread {
  public:
   FeatureWriterThread(size_t num_images,
@@ -250,10 +262,11 @@ class FeatureWriterThread : public Thread {
 
       auto input_job = input_queue_->Pop();
       if (input_job.IsValid()) {
+        // step: 1 获取数据并打印基本信息
         auto& image_data = input_job.Data();
 
         image_index += 1;
-
+        
         LOG(INFO) << StringPrintf(
             "Processed file [%d/%d]", image_index, num_images_);
 
@@ -296,10 +309,14 @@ class FeatureWriterThread : public Thread {
         LOG(INFO) << StringPrintf("  Features:        %d",
                                   image_data.keypoints.size());
 
+        // step: 2 database开启并写入
         DatabaseTransaction database_transaction(database_);
 
         if (image_data.image.ImageId() == kInvalidImageId) {
+          // step: 2.1 image
           image_data.image.SetImageId(database_->WriteImage(image_data.image));
+
+          // step: 2.2 pose_prior
           if (image_data.pose_prior.IsValid()) {
             LOG(INFO) << StringPrintf(
                 "  GPS:             LAT=%.3f, LON=%.3f, ALT=%.3f",
@@ -311,11 +328,13 @@ class FeatureWriterThread : public Thread {
           }
         }
 
+        // step: 2.3 keypoints
         if (!database_->ExistsKeypoints(image_data.image.ImageId())) {
           database_->WriteKeypoints(image_data.image.ImageId(),
                                     image_data.keypoints);
         }
 
+        // step: 2.4 desc.
         if (!database_->ExistsDescriptors(image_data.image.ImageId())) {
           database_->WriteDescriptors(image_data.image.ImageId(),
                                       image_data.descriptors);
@@ -332,6 +351,7 @@ class FeatureWriterThread : public Thread {
 };
 
 // Feature extraction class to extract features for all images in a directory.
+// api: 特征提取控制器类
 class FeatureExtractorController : public Thread {
  public:
   FeatureExtractorController(const ImageReaderOptions& reader_options,
@@ -343,6 +363,7 @@ class FeatureExtractorController : public Thread {
     THROW_CHECK(reader_options_.Check());
     THROW_CHECK(sift_options_.Check());
 
+    // step: 1 camera_mask
     std::shared_ptr<Bitmap> camera_mask;
     if (!reader_options_.camera_mask_path.empty()) {
       camera_mask = std::make_shared<Bitmap>();
@@ -355,17 +376,20 @@ class FeatureExtractorController : public Thread {
       }
     }
 
+    // step: 2 线程资源
     const int num_threads = GetEffectiveNumThreads(sift_options_.num_threads);
     THROW_CHECK_GT(num_threads, 0);
 
     // Make sure that we only have limited number of objects in the queue to
     // avoid excess in memory usage since images and features take lots of
     // memory.
+    // step: 3 控制JobQueue的数量
     const int kQueueSize = 1;
     resizer_queue_ = std::make_unique<JobQueue<ImageData>>(kQueueSize);
     extractor_queue_ = std::make_unique<JobQueue<ImageData>>(kQueueSize);
     writer_queue_ = std::make_unique<JobQueue<ImageData>>(kQueueSize);
 
+    // step: 4 分配Resizer线程数组
     if (sift_options_.max_image_size > 0) {
       for (int i = 0; i < num_threads; ++i) {
         resizers_.emplace_back(
@@ -375,6 +399,7 @@ class FeatureExtractorController : public Thread {
       }
     }
 
+    // step: 5 特征提取
     if (!sift_options_.domain_size_pooling &&
         !sift_options_.estimate_affine_shape && sift_options_.use_gpu) {
       std::vector<int> gpu_indices = CSVToVector<int>(sift_options_.gpu_index);
@@ -388,7 +413,7 @@ class FeatureExtractorController : public Thread {
         std::iota(gpu_indices.begin(), gpu_indices.end(), 0);
       }
 #endif  // COLMAP_CUDA_ENABLED
-
+      // step: 5.1 按GPU数量分配
       auto sift_gpu_options = sift_options_;
       for (const auto& gpu_index : gpu_indices) {
         sift_gpu_options.gpu_index = std::to_string(gpu_index);
@@ -413,6 +438,7 @@ class FeatureExtractorController : public Thread {
                "memory for the current settings.";
       }
 
+      // step: 5.2 按CPU线程数分配
       auto custom_sift_options = sift_options_;
       custom_sift_options.use_gpu = false;
       for (int i = 0; i < num_threads; ++i) {
@@ -424,6 +450,7 @@ class FeatureExtractorController : public Thread {
       }
     }
 
+    // step: 6 特征输出
     writer_ = std::make_unique<FeatureWriterThread>(
         image_reader_.NumImages(), &database_, writer_queue_.get());
   }
@@ -434,6 +461,7 @@ class FeatureExtractorController : public Thread {
     Timer run_timer;
     run_timer.Start();
 
+    // step: 1 开启 resizer、extractor & writer
     for (auto& resizer : resizers_) {
       resizer->Start();
     }
@@ -450,6 +478,7 @@ class FeatureExtractorController : public Thread {
       }
     }
 
+    // step: 2 循环处理数据
     while (image_reader_.NextIndex() < image_reader_.NumImages()) {
       if (IsStopped()) {
         resizer_queue_->Stop();
@@ -459,6 +488,7 @@ class FeatureExtractorController : public Thread {
         break;
       }
 
+      // step: 2.1 读取图片数据
       ImageData image_data;
       image_data.status = image_reader_.Next(&image_data.camera,
                                              &image_data.image,
@@ -470,6 +500,7 @@ class FeatureExtractorController : public Thread {
         image_data.bitmap.Deallocate();
       }
 
+      // step: 2.2 resizer / extractor 处理当前图片
       if (sift_options_.max_image_size > 0) {
         THROW_CHECK(resizer_queue_->Push(std::move(image_data)));
       } else {
@@ -477,6 +508,7 @@ class FeatureExtractorController : public Thread {
       }
     }
 
+    // step: 3 停止
     resizer_queue_->Wait();
     resizer_queue_->Stop();
     for (auto& resizer : resizers_) {

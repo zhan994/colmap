@@ -186,15 +186,21 @@ class Database {
 
   // Add new image and return its database identifier. If `use_image_id`
   // is false a new identifier is automatically generated.
+  // api: 写image，默认会自动创建新的image_id
   image_t WriteImage(const Image& image, bool use_image_id = false) const;
 
   // Write a new entry in the database. The user is responsible for making sure
   // that the entry does not yet exist. For image pairs, the order of
   // `image_id1` and `image_id2` does not matter.
+  // api: 写先验pose
   void WritePosePrior(image_t image_id, const PosePrior& pose_prior) const;
+
+  // api: 写keypoints
   void WriteKeypoints(image_t image_id,
                       const FeatureKeypoints& keypoints) const;
   void WriteKeypoints(image_t image_id, const FeatureKeypointsBlob& blob) const;
+  
+  // api: 写desc.
   void WriteDescriptors(image_t image_id,
                         const FeatureDescriptors& descriptors) const;
   void WriteMatches(image_t image_id1,
@@ -251,6 +257,7 @@ class Database {
                     Database* merged_database);
 
  private:
+  // note: 友元类 DatabaseTransaction 可用 Database 私有数据
   friend class DatabaseTransaction;
 
   // Combine multiple queries into one transaction by wrapping a code section
@@ -371,6 +378,7 @@ class Database {
 // This class automatically manages the scope of a database transaction by
 // calling `BeginTransaction` and `EndTransaction` during construction and
 // destruction, respectively.
+// api: 数据库处理类，自动管理开始与结束
 class DatabaseTransaction {
  public:
   explicit DatabaseTransaction(Database* database);

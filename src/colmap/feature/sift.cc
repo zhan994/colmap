@@ -111,6 +111,7 @@ FeatureDescriptors TransformVLFeatToUBCFeatureDescriptors(
   return ubc_descriptors;
 }
 
+// api: SIFT CPU 特征提取类
 class SiftCPUFeatureExtractor : public FeatureExtractor {
  public:
   using VlSiftType = std::unique_ptr<VlSiftFilt, void (*)(VlSiftFilt*)>;
@@ -130,6 +131,7 @@ class SiftCPUFeatureExtractor : public FeatureExtractor {
     return std::make_unique<SiftCPUFeatureExtractor>(options);
   }
 
+  
   bool Extract(const Bitmap& bitmap,
                FeatureKeypoints* keypoints,
                FeatureDescriptors* descriptors) {
@@ -709,9 +711,11 @@ std::unique_ptr<FeatureExtractor> CreateSiftFeatureExtractor(
     const SiftExtractionOptions& options) {
   if (options.estimate_affine_shape || options.domain_size_pooling ||
       options.force_covariant_extractor) {
+    // step: 1 Covariant SIFT CPU
     LOG(INFO) << "Creating Covariant SIFT CPU feature extractor";
     return CovariantSiftCPUFeatureExtractor::Create(options);
   } else if (options.use_gpu) {
+    // step: 2 SIFT GPU
 #if defined(COLMAP_GPU_ENABLED)
     LOG(INFO) << "Creating SIFT GPU feature extractor";
     return SiftGPUFeatureExtractor::Create(options);
@@ -719,6 +723,7 @@ std::unique_ptr<FeatureExtractor> CreateSiftFeatureExtractor(
     return nullptr;
 #endif  // COLMAP_GPU_ENABLED
   } else {
+    // step: 3 SIFT CPU
     LOG(INFO) << "Creating SIFT CPU feature extractor";
     return SiftCPUFeatureExtractor::Create(options);
   }

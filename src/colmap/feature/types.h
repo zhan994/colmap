@@ -38,6 +38,7 @@
 
 namespace colmap {
 
+// api: 特征点数据结构体
 struct FeatureKeypoint {
   FeatureKeypoint();
   FeatureKeypoint(float x, float y);
