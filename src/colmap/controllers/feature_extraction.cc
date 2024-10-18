@@ -171,6 +171,7 @@ class SiftFeatureExtractorThread : public Thread {
   }
 
  private:
+  // api: 特征提取线程主函数
   void Run() override {
     if (sift_options_.use_gpu) {
 #if !defined(COLMAP_CUDA_ENABLED)
@@ -253,6 +254,7 @@ class FeatureWriterThread : public Thread {
         input_queue_(input_queue) {}
 
  private:
+  // api: 特征输出线程主函数
   void Run() override {
     size_t image_index = 0;
     while (true) {
@@ -351,7 +353,7 @@ class FeatureWriterThread : public Thread {
 };
 
 // Feature extraction class to extract features for all images in a directory.
-// api: 特征提取控制器类
+// api: 特征提取控制器线程类
 class FeatureExtractorController : public Thread {
  public:
   FeatureExtractorController(const ImageReaderOptions& reader_options,
@@ -456,6 +458,7 @@ class FeatureExtractorController : public Thread {
   }
 
  private:
+  // api: 特征提取控制器线程主函数
   void Run() override {
     PrintHeading1("Feature extraction");
     Timer run_timer;

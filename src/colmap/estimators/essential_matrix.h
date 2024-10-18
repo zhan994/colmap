@@ -46,6 +46,7 @@ namespace colmap {
 //    D. Nister, An efficient solution to the five-point relative pose problem,
 //    IEEE-T-PAMI, 26(6), 2004.
 //    http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.86.8769
+// api: 5点法计算E，提供归一化坐标系的点对
 class EssentialMatrixFivePointEstimator {
  public:
   typedef Eigen::Vector2d X_t;

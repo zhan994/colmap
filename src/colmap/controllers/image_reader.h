@@ -94,6 +94,7 @@ struct ImageReaderOptions {
 // Recursively iterate over the images in a directory. Skips an image if it
 // already exists in the database. Extracts the camera intrinsics from EXIF and
 // writes the camera information to the database.
+// api: 图片读取类
 class ImageReader {
  public:
   enum class Status {

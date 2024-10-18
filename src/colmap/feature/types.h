@@ -83,6 +83,7 @@ typedef Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
     FeatureDescriptorsFloat;
 
+// api: 特征匹配数据结构体
 struct FeatureMatch {
   FeatureMatch()
       : point2D_idx1(kInvalidPoint2DIdx), point2D_idx2(kInvalidPoint2DIdx) {}

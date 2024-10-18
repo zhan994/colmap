@@ -468,6 +468,7 @@ inline Eigen::Vector2d CameraModelImgFromCam(CameraModelId model_id,
 // @param xy            Image coordinates in pixels.
 //
 // @return              Output Coordinates in camera system as (u, v, w=1).
+// api: 
 inline Eigen::Vector3d CameraModelCamFromImg(CameraModelId model_id,
                                              const std::vector<double>& params,
                                              const Eigen::Vector2d& xy);

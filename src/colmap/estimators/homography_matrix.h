@@ -41,6 +41,7 @@ namespace colmap {
 // Direct linear transformation algorithm to compute the homography between
 // point pairs. This algorithm computes the least squares estimate for
 // the homography from at least 4 correspondences.
+// api: DLT计算H，提供像素点对
 class HomographyMatrixEstimator {
  public:
   typedef Eigen::Vector2d X_t;

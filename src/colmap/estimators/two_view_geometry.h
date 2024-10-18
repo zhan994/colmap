@@ -117,6 +117,7 @@ struct TwoViewGeometryOptions {
 // @param points2         Feature points in second image.
 // @param matches         Feature matches between first and second image.
 // @param options         Two-view geometry estimation options.
+// api: 估计图像对的对极几何
 TwoViewGeometry EstimateTwoViewGeometry(
     const Camera& camera1,
     const std::vector<Eigen::Vector2d>& points1,
@@ -147,6 +148,7 @@ bool EstimateTwoViewGeometryPose(const Camera& camera1,
 // @param points2         Feature points in second image.
 // @param matches         Feature matches between first and second image.
 // @param options         Two-view geometry estimation options.
+// api: 估计纠正好（有先验focal_len）的图像对的对极几何
 TwoViewGeometry EstimateCalibratedTwoViewGeometry(
     const Camera& camera1,
     const std::vector<Eigen::Vector2d>& points1,

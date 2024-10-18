@@ -315,6 +315,7 @@ TwoViewGeometry EstimateTwoViewGeometry(
     return EstimateCalibratedHomography(
         camera1, points1, camera2, points2, matches, options);
   } else if (camera1.has_prior_focal_length && camera2.has_prior_focal_length) {
+    // note: 通常用这个
     return EstimateCalibratedTwoViewGeometry(
         camera1, points1, camera2, points2, matches, options);
   } else {
@@ -421,6 +422,7 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
 
   TwoViewGeometry geometry;
 
+  // step: 1 是否满足内点阈值，否则退化DEGENERATE
   const size_t min_num_inliers = static_cast<size_t>(options.min_num_inliers);
   if (matches.size() < min_num_inliers) {
     geometry.config = TwoViewGeometry::ConfigurationType::DEGENERATE;
@@ -428,6 +430,7 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
   }
 
   // Extract corresponding points.
+  // step: 2 提取对应点数据，像素坐标 & 归一化相机坐标
   std::vector<Eigen::Vector2d> matched_points1(matches.size());
   std::vector<Eigen::Vector2d> matched_points2(matches.size());
   std::vector<Eigen::Vector2d> matched_points1_normalized(matches.size());
@@ -442,7 +445,8 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
   }
 
   // Estimate epipolar models.
-
+  // step: 3 估计对极几何
+  // step: 3.1 EssentialMatrix
   auto E_ransac_options = options.ransac_options;
   E_ransac_options.max_error =
       (camera1.CamFromImgThreshold(options.ransac_options.max_error) +
@@ -455,6 +459,7 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
       E_ransac.Estimate(matched_points1_normalized, matched_points2_normalized);
   geometry.E = E_report.model;
 
+  // step: 3.2 FundamentalMatrix
   LORANSAC<FundamentalMatrixSevenPointEstimator,
            FundamentalMatrixEightPointEstimator>
       F_ransac(options.ransac_options);
@@ -463,11 +468,13 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
 
   // Estimate planar or panoramic model.
 
+  // step: 3.3 HomographyMatrix
   LORANSAC<HomographyMatrixEstimator, HomographyMatrixEstimator> H_ransac(
       options.ransac_options);
   const auto H_report = H_ransac.Estimate(matched_points1, matched_points2);
   geometry.H = H_report.model;
 
+  // step: 3.4 E&F&H失败 或者 三者内点数都较少，则退化DEGENERATE
   if ((!E_report.success && !F_report.success && !H_report.success) ||
       (E_report.support.num_inliers < min_num_inliers &&
        F_report.support.num_inliers < min_num_inliers &&
@@ -477,7 +484,7 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
   }
 
   // Determine inlier ratios of different models.
-
+  // step: 3.5 计算三中几何的内点比例
   const double E_F_inlier_ratio =
       static_cast<double>(E_report.support.num_inliers) /
       F_report.support.num_inliers;
@@ -491,10 +498,11 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
   const std::vector<char>* best_inlier_mask = nullptr;
   size_t num_inliers = 0;
 
+  // step: 3.6 输出最好的几何关系
   if (E_report.success && E_F_inlier_ratio > options.min_E_F_inlier_ratio &&
       E_report.support.num_inliers >= min_num_inliers) {
     // Calibrated configuration.
-
+    // note: 优先考虑E满足，且内点数以三者最优为准
     // Always use the model with maximum matches.
     if (E_report.support.num_inliers >= F_report.support.num_inliers) {
       num_inliers = E_report.support.num_inliers;
@@ -504,6 +512,7 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
       best_inlier_mask = &F_report.inlier_mask;
     }
 
+    // note: H满足则为平面PLANAR_OR_PANORAMIC，否则CALIBRATED
     if (H_E_inlier_ratio > options.max_H_inlier_ratio) {
       geometry.config = TwoViewGeometry::ConfigurationType::PLANAR_OR_PANORAMIC;
       if (H_report.support.num_inliers > num_inliers) {
@@ -516,10 +525,11 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
   } else if (F_report.success &&
              F_report.support.num_inliers >= min_num_inliers) {
     // Uncalibrated configuration.
-
+    // note: E不满足，看F和H内点最优
     num_inliers = F_report.support.num_inliers;
     best_inlier_mask = &F_report.inlier_mask;
 
+    // note: H满足则为平面PLANAR_OR_PANORAMIC，否则UNCALIBRATED
     if (H_F_inlier_ratio > options.max_H_inlier_ratio) {
       geometry.config = TwoViewGeometry::ConfigurationType::PLANAR_OR_PANORAMIC;
       if (H_report.support.num_inliers > num_inliers) {
@@ -531,18 +541,23 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
     }
   } else if (H_report.success &&
              H_report.support.num_inliers >= min_num_inliers) {
+    // note: E&F都不满足，用H内点，为平面PLANAR_OR_PANORAMIC
     num_inliers = H_report.support.num_inliers;
     best_inlier_mask = &H_report.inlier_mask;
     geometry.config = TwoViewGeometry::ConfigurationType::PLANAR_OR_PANORAMIC;
   } else {
+    // note: 三者都不满足为退化DEGENERATE
     geometry.config = TwoViewGeometry::ConfigurationType::DEGENERATE;
     return geometry;
   }
 
+  // step: 4 最终的对极几何输出
   if (best_inlier_mask != nullptr) {
+    // step: 4.1 输出匹配内点
     geometry.inlier_matches =
         ExtractInlierMatches(matches, num_inliers, *best_inlier_mask);
 
+    // step: 4.2 是否detect_watermark
     if (options.detect_watermark && DetectWatermark(camera1,
                                                     matched_points1,
                                                     camera2,
@@ -553,7 +568,10 @@ TwoViewGeometry EstimateCalibratedTwoViewGeometry(
       geometry.config = TwoViewGeometry::ConfigurationType::WATERMARK;
     }
 
+    // step: 4.3 是否根据对极几何计算相对位姿
     if (options.compute_relative_pose) {
+      std::cout << "compute relative pose from two_view_geometry,,,"
+                << std::endl;
       EstimateTwoViewGeometryPose(
           camera1, points1, camera2, points2, &geometry);
     }

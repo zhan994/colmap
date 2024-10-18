@@ -245,6 +245,7 @@ class VocabTreePairGenerator : public PairGenerator {
   size_t result_idx_ = 0;
 };
 
+// api: 序列化图像对生成器类
 class SequentialPairGenerator : public PairGenerator {
  public:
   using PairOptions = SequentialMatchingOptions;

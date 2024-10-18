@@ -113,6 +113,7 @@ std::string JoinPaths(T const&... paths);
 std::vector<std::string> GetFileList(const std::string& path);
 
 // Return list of files, recursively in all sub-directories.
+// api: 返回文件夹内的所有文件
 std::vector<std::string> GetRecursiveFileList(const std::string& path);
 
 // Return list of directories, recursively in all sub-directories.

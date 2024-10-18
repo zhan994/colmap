@@ -125,12 +125,15 @@ struct Camera {
                              double max_extra_param) const;
 
   // Project point in image plane to world / infinity.
+  // api: 投影像素点到相机归一化平面坐标系
   inline Eigen::Vector2d CamFromImg(const Eigen::Vector2d& image_point) const;
 
   // Convert pixel threshold in image plane to camera frame.
+  // api: 投影像素扰动值到归一化相机坐标系下的值
   inline double CamFromImgThreshold(double threshold) const;
 
   // Project point from camera frame to image plane.
+  // api: 投影像素点到相机归一化平面坐标系
   inline Eigen::Vector2d ImgFromCam(const Eigen::Vector2d& cam_point) const;
 
   // Rescale camera dimensions and accordingly the focal length and

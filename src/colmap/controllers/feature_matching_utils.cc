@@ -148,6 +148,7 @@ std::shared_ptr<FeatureDescriptors> FeatureMatcherWorker::GetDescriptorsPtr(
 
 namespace {
 
+// api: 验证特征匹配线程类
 class VerifierWorker : public Thread {
  public:
   typedef FeatureMatcherData Input;
@@ -165,6 +166,7 @@ class VerifierWorker : public Thread {
   }
 
  protected:
+  // api: 验证特征匹配线程主函数
   void Run() override {
     while (true) {
       if (IsStopped()) {
@@ -175,12 +177,14 @@ class VerifierWorker : public Thread {
       if (input_job.IsValid()) {
         auto& data = input_job.Data();
 
+        // step: 1 是否满足验证数量
         if (data.matches.size() <
             static_cast<size_t>(options_.min_num_inliers)) {
           THROW_CHECK(output_queue_->Push(std::move(data)));
           continue;
         }
 
+        // step: 2 获取匹配数据
         const auto& camera1 =
             cache_->GetCamera(cache_->GetImage(data.image_id1).CameraId());
         const auto& camera2 =
@@ -192,6 +196,7 @@ class VerifierWorker : public Thread {
         const std::vector<Eigen::Vector2d> points2 =
             FeatureKeypointsToPointsVector(*keypoints2);
 
+        // step: 3 估计对极几何关系，验证匹配结果是否合理
         data.two_view_geometry = EstimateTwoViewGeometry(
             camera1, points1, camera2, points2, data.matches, options_);
 

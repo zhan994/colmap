@@ -50,12 +50,14 @@ ImageReader::ImageReader(const ImageReaderOptions& options, Database* database)
   THROW_CHECK(options_.Check());
 
   // Ensure trailing slash, so that we can build the correct image name.
+  // step: 1 纠正路径名称
   options_.image_path =
       EnsureTrailingSlash(StringReplace(options_.image_path, "\\", "/"));
   options_.mask_path =
       EnsureTrailingSlash(StringReplace(options_.mask_path, "\\", "/"));
 
   // Get a list of all files in the image path, sorted by image name.
+  // step: 2 获取图片路径列表，并排序
   if (options_.image_list.empty()) {
     options_.image_list = GetRecursiveFileList(options_.image_path);
     std::sort(options_.image_list.begin(), options_.image_list.end());
@@ -69,6 +71,7 @@ ImageReader::ImageReader(const ImageReaderOptions& options, Database* database)
     }
   }
 
+  // step: 3 配置相机参数
   if (static_cast<camera_t>(options_.existing_camera_id) != kInvalidCameraId) {
     THROW_CHECK(database->ExistsCamera(options_.existing_camera_id));
     prev_camera_ = database->ReadCamera(options_.existing_camera_id);

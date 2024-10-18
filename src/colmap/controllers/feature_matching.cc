@@ -46,7 +46,7 @@ void PrintElapsedTime(const Timer& timer) {
   LOG(INFO) << StringPrintf(" in %.3fs", timer.ElapsedSeconds());
 }
 
-// api: 特征匹配模板类，包含控制器对象
+// api: 特征匹配线程模板类，包含控制器对象
 template <typename DerivedPairGenerator>
 class GenericFeatureMatcher : public Thread {
  public:
@@ -66,6 +66,7 @@ class GenericFeatureMatcher : public Thread {
   }
 
  private:
+  // api: 特征匹配线程模板主函数
   void Run() override {
     PrintHeading1("Feature matching");
     Timer run_timer;

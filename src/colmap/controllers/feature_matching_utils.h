@@ -65,6 +65,7 @@ class FeatureMatcherWorker : public Thread {
   void SetMaxNumMatches(int max_num_matches);
 
  private:
+  // api: 特征匹配工作线程主函数
   void Run() override;
 
   std::shared_ptr<FeatureKeypoints> GetKeypointsPtr(int index,
@@ -118,9 +119,9 @@ class FeatureMatcherController {
 
   bool is_setup_;
 
-  std::vector<std::unique_ptr<FeatureMatcherWorker>> matchers_;
+  std::vector<std::unique_ptr<FeatureMatcherWorker>> matchers_; // 匹配
   std::vector<std::unique_ptr<FeatureMatcherWorker>> guided_matchers_;
-  std::vector<std::unique_ptr<Thread>> verifiers_;
+  std::vector<std::unique_ptr<Thread>> verifiers_; // 验证
   std::unique_ptr<ThreadPool> thread_pool_;
 
   JobQueue<FeatureMatcherData> matcher_queue_;

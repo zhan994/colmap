@@ -44,6 +44,7 @@ namespace colmap {
 // Implementation of LO-RANSAC (Locally Optimized RANSAC).
 //
 // "Locally Optimized RANSAC" Ondrej Chum, Jiri Matas, Josef Kittler, DAGM 2003.
+// api: LO-RANSAC (Locally Optimized RANSAC)类
 template <typename Estimator,
           typename LocalEstimator,
           typename SupportMeasurer = InlierSupportMeasurer,

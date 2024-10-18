@@ -47,6 +47,7 @@ namespace colmap {
 //    Zhengyou Zhang and T. Kanade, Determining the Epipolar Geometry and its
 //    Uncertainty: A Review, International Journal of Computer Vision, 1998.
 //    http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.33.4540
+// api: 7点法计算F，提供像素点对
 class FundamentalMatrixSevenPointEstimator {
  public:
   typedef Eigen::Vector2d X_t;
@@ -89,6 +90,7 @@ class FundamentalMatrixSevenPointEstimator {
 // This algorithm solves the 8-Point problem based on the following paper:
 //
 //    Hartley and Zisserman, Multiple View Geometry, algorithm 11.1, page 282.
+// api: 8点法计算F，提供像素点对
 class FundamentalMatrixEightPointEstimator {
  public:
   typedef Eigen::Vector2d X_t;
