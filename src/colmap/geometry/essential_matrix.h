@@ -67,6 +67,17 @@ void DecomposeEssentialMatrix(const Eigen::Matrix3d& E,
 // @param R            Most probable 3x3 rotation matrix.
 // @param t            Most probable 3x1 translation vector.
 // @param points3D     Triangulated 3D points infront of camera.
+
+/**
+ * \brief // api: 通过本质矩阵 E 恢复外参
+ * 
+ * \param E 
+ * \param points1 归一化相机平面坐标系点1
+ * \param points2 归一化相机平面坐标系点2
+ * \param R 姿态
+ * \param t 位移
+ * \param points3D 相机前方的三角化的点
+ */
 void PoseFromEssentialMatrix(const Eigen::Matrix3d& E,
                              const std::vector<Eigen::Vector2d>& points1,
                              const std::vector<Eigen::Vector2d>& points2,

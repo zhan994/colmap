@@ -108,16 +108,17 @@ struct TwoViewGeometryOptions {
   bool Check() const;
 };
 
-// Estimate two-view geometry from calibrated or uncalibrated image pair,
-// depending on whether a prior focal length is given or not.
-//
-// @param camera1         Camera of first image.
-// @param points1         Feature points in first image.
-// @param camera2         Camera of second image.
-// @param points2         Feature points in second image.
-// @param matches         Feature matches between first and second image.
-// @param options         Two-view geometry estimation options.
-// api: 估计图像对的对极几何
+/**
+ * \brief // api: 估计图像对的对极几何
+ * 
+ * \param camera1 Camera of first image.
+ * \param points1 Feature points in first image.
+ * \param camera2 Camera of second image.
+ * \param points2 Feature points in second image.
+ * \param matches Feature matches between first and second image.
+ * \param options Two-view geometry estimation options.
+ * \return TwoViewGeometry 
+ */
 TwoViewGeometry EstimateTwoViewGeometry(
     const Camera& camera1,
     const std::vector<Eigen::Vector2d>& points1,
@@ -126,14 +127,17 @@ TwoViewGeometry EstimateTwoViewGeometry(
     const FeatureMatches& matches,
     const TwoViewGeometryOptions& options);
 
-// Estimate relative pose for two-view geometry.
-//
-// @param camera1         Camera of first image.
-// @param points1         Feature points in first image.
-// @param camera2         Camera of second image.
-// @param points2         Feature points in second image.
-// @param matches         Feature matches between first and second image.
-// @param options         Two-view geometry estimation options.
+/**
+ * \brief // api: E/H估计相对位姿
+ * 
+ * \param camera1 Camera of first image.
+ * \param points1 Feature points in first image.
+ * \param camera2 Camera of second image.
+ * \param points2 Feature points in second image.
+ * \param geometry Two-view geometry estimation options.
+ * \return true 
+ * \return false 
+ */
 bool EstimateTwoViewGeometryPose(const Camera& camera1,
                                  const std::vector<Eigen::Vector2d>& points1,
                                  const Camera& camera2,

@@ -155,6 +155,7 @@ Rigid3d InterpolateCameraPoses(const Rigid3d& cam_from_world1,
 
 namespace {
 
+// api: 计算相机坐标系下的深度值
 double CalculateDepth(const Eigen::Matrix3x4d& cam_from_world,
                       const Eigen::Vector3d& point3D) {
   const double proj_z = cam_from_world.row(2).dot(point3D.homogeneous());
@@ -169,12 +170,17 @@ bool CheckCheirality(const Eigen::Matrix3d& R,
                      const std::vector<Eigen::Vector2d>& points2,
                      std::vector<Eigen::Vector3d>* points3D) {
   THROW_CHECK_EQ(points1.size(), points2.size());
+  // step: 1 外参赋值
   const Eigen::Matrix3x4d proj_matrix1 = Eigen::Matrix3x4d::Identity();
   Eigen::Matrix3x4d proj_matrix2;
   proj_matrix2.leftCols<3>() = R;
   proj_matrix2.col(3) = t;
+
+  // step: 2 深度阈值
   const double kMinDepth = std::numeric_limits<double>::epsilon();
   const double max_depth = 1000.0f * (R.transpose() * t).norm();
+
+  // step: 3 逐个三角化，验证深度是否在合理区间
   points3D->clear();
   for (size_t i = 0; i < points1.size(); ++i) {
     const Eigen::Vector3d point3D =
@@ -187,6 +193,8 @@ bool CheckCheirality(const Eigen::Matrix3d& R,
       }
     }
   }
+
+  // step: 4 是否输出有效3d点
   return !points3D->empty();
 }
 

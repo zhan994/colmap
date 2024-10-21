@@ -157,19 +157,22 @@ std::vector<double> CalculateTriangulationAngles(
     const Eigen::Vector3d& proj_center2,
     const std::vector<Eigen::Vector3d>& points3D) {
   // Baseline length between camera centers.
+  // step: 1 计算基线距离
   const double baseline_length_squared =
       (proj_center1 - proj_center2).squaredNorm();
 
+  // step: 2 逐个计算3d点形成的夹角
   std::vector<double> angles(points3D.size());
-
   for (size_t i = 0; i < points3D.size(); ++i) {
     // Ray lengths from cameras to point.
+    // step: 2.1 计算3d点到相机中心的距离
     const double ray_length_squared1 =
         (points3D[i] - proj_center1).squaredNorm();
     const double ray_length_squared2 =
         (points3D[i] - proj_center2).squaredNorm();
 
     // Using "law of cosines" to compute the enclosing angle between rays.
+    // step: 2.2 cosine = (a^2 + b^2 -c^) / 2ab
     const double denominator =
         2.0 * std::sqrt(ray_length_squared1 * ray_length_squared2);
     if (denominator == 0.0) {

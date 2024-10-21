@@ -68,14 +68,17 @@ void PoseFromEssentialMatrix(const Eigen::Matrix3d& E,
                              std::vector<Eigen::Vector3d>* points3D) {
   THROW_CHECK_EQ(points1.size(), points2.size());
 
+  // step: 1 分解 R1&R2 和 t
   Eigen::Matrix3d R1;
   Eigen::Matrix3d R2;
   DecomposeEssentialMatrix(E, &R1, &R2, t);
 
   // Generate all possible projection matrix combinations.
+  // step: 2 生成所有可能的组合
   const std::array<Eigen::Matrix3d, 4> R_cmbs{{R1, R2, R1, R2}};
   const std::array<Eigen::Vector3d, 4> t_cmbs{{*t, *t, -*t, -*t}};
 
+  // step: 3 逐个三角化，取三角化点数最多的组合
   points3D->clear();
   for (size_t i = 0; i < R_cmbs.size(); ++i) {
     std::vector<Eigen::Vector3d> points3D_cmb;

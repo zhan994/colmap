@@ -104,6 +104,18 @@ Rigid3d InterpolateCameraPoses(const Rigid3d& cam_from_world1,
 // @param points1      First set of corresponding points.
 // @param points2      Second set of corresponding points.
 // @param points3D     Points that lie in front of both cameras.
+
+/**
+ * \brief // api: 检查是否三角化的点都在相机前方
+ * 
+ * \param R 
+ * \param t 
+ * \param points1 归一化相机平面坐标系点1
+ * \param points2 归一化相机平面坐标系点2
+ * \param points3D 相机前方的三角话的点
+ * \return true 
+ * \return false 
+ */
 bool CheckCheirality(const Eigen::Matrix3d& R,
                      const Eigen::Vector3d& t,
                      const std::vector<Eigen::Vector2d>& points1,

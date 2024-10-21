@@ -194,11 +194,13 @@ void PoseFromHomographyMatrix(const Eigen::Matrix3d& H,
                               std::vector<Eigen::Vector3d>* points3D) {
   THROW_CHECK_EQ(points1.size(), points2.size());
 
+  // step: 1 分解R&t
   std::vector<Eigen::Matrix3d> R_cmbs;
   std::vector<Eigen::Vector3d> t_cmbs;
   std::vector<Eigen::Vector3d> n_cmbs;
   DecomposeHomographyMatrix(H, K1, K2, &R_cmbs, &t_cmbs, &n_cmbs);
 
+  // step: 2 逐个三角化，取三角化点数最多的组合
   points3D->clear();
   for (size_t i = 0; i < R_cmbs.size(); ++i) {
     std::vector<Eigen::Vector3d> points3D_cmb;

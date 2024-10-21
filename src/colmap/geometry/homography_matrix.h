@@ -53,6 +53,17 @@ namespace colmap {
 // @param R          Possible 3x3 rotation matrices.
 // @param t          Possible translation vectors.
 // @param n          Possible normal vectors.
+
+/**
+ * \brief // api: 分解单应H得到可能的外参
+ *
+ * \param H 单应
+ * \param K1 内参1
+ * \param K2 内参2
+ * \param R 姿态列表
+ * \param t 位移列表
+ * \param n 法向量列表
+ */
 void DecomposeHomographyMatrix(const Eigen::Matrix3d& H,
                                const Eigen::Matrix3d& K1,
                                const Eigen::Matrix3d& K2,
@@ -77,6 +88,20 @@ void DecomposeHomographyMatrix(const Eigen::Matrix3d& H,
 // @param n            Most probable 3x1 normal vector.
 // @param points3D     Triangulated 3D points infront of camera
 //                     (only if homography is not pure-rotational).
+
+/**
+ * \brief // api: 通过单应H恢复外参
+ *
+ * \param H
+ * \param K1 内参1
+ * \param K2 内参2
+ * \param points1 归一化相机平面坐标系点1
+ * \param points2 归一化相机平面坐标系点2
+ * \param R 姿态
+ * \param t 位移
+ * \param n 平面法向量
+ * \param points3D 三角化点
+ */
 void PoseFromHomographyMatrix(const Eigen::Matrix3d& H,
                               const Eigen::Matrix3d& K1,
                               const Eigen::Matrix3d& K2,

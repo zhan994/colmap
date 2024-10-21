@@ -103,6 +103,7 @@ std::vector<Eigen::Vector3d> TriangulateOptimalPoints(
     const std::vector<Eigen::Vector2d>& points2);
 
 // Calculate angle in radians between the two rays of a triangulated point.
+// api: 计算三角化的点与两相机中心位置的夹角
 double CalculateTriangulationAngle(const Eigen::Vector3d& proj_center1,
                                    const Eigen::Vector3d& proj_center2,
                                    const Eigen::Vector3d& point3D);

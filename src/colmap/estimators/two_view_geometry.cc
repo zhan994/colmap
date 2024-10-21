@@ -330,6 +330,7 @@ bool EstimateTwoViewGeometryPose(const Camera& camera1,
                                  const std::vector<Eigen::Vector2d>& points2,
                                  TwoViewGeometry* geometry) {
   // We need a valid epopolar geometry to estimate the relative pose.
+  // step: 1 需要有效的对极几何
   if (geometry->config != TwoViewGeometry::ConfigurationType::CALIBRATED &&
       geometry->config != TwoViewGeometry::ConfigurationType::UNCALIBRATED &&
       geometry->config != TwoViewGeometry::ConfigurationType::PLANAR &&
@@ -340,6 +341,7 @@ bool EstimateTwoViewGeometryPose(const Camera& camera1,
   }
 
   // Extract normalized inlier points.
+  // step: 2 提取归一化内点
   std::vector<Eigen::Vector2d> inlier_points1_normalized;
   inlier_points1_normalized.reserve(geometry->inlier_matches.size());
   std::vector<Eigen::Vector2d> inlier_points2_normalized;
@@ -353,7 +355,7 @@ bool EstimateTwoViewGeometryPose(const Camera& camera1,
 
   Eigen::Matrix3d cam2_from_cam1_rot_mat;
   std::vector<Eigen::Vector3d> points3D;
-
+  // step: 3 使用E/H恢复外参，以及对应的三角化的点
   if (geometry->config == TwoViewGeometry::ConfigurationType::CALIBRATED ||
       geometry->config == TwoViewGeometry::ConfigurationType::UNCALIBRATED) {
     // Try to recover relative pose for calibrated and uncalibrated
@@ -385,9 +387,11 @@ bool EstimateTwoViewGeometryPose(const Camera& camera1,
     return false;
   }
 
+  // step: 4 将上述外参恢复的结果进行赋值
   geometry->cam2_from_cam1.rotation =
       Eigen::Quaterniond(cam2_from_cam1_rot_mat);
 
+  // step: 5 计算三角化点形成的观测夹角的中值
   if (points3D.empty()) {
     geometry->tri_angle = 0;
   } else {
