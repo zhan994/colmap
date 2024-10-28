@@ -510,10 +510,13 @@ double Reconstruction::ComputeMeanReprojectionError() const {
 
 void Reconstruction::UpdatePoint3DErrors() {
   for (auto& point3D : points3D_) {
+    // step: 1 没有track_elements则跳过
     if (point3D.second.track.Length() == 0) {
       point3D.second.error = 0;
       continue;
     }
+
+    // step: 2 逐个计算element的误差并累计取平均值
     point3D.second.error = 0;
     for (const auto& track_el : point3D.second.track.Elements()) {
       const auto& image = Image(track_el.image_id);

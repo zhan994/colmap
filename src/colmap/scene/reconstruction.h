@@ -193,6 +193,7 @@ class Reconstruction {
   double ComputeMeanReprojectionError() const;
 
   // Updates mean reprojection errors for all 3D points.
+  // api: 更新3d点的平均重投影误差
   void UpdatePoint3DErrors();
 
   // Read data from text or binary file. Prefer binary data if it exists.

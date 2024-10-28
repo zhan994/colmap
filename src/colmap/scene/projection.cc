@@ -38,13 +38,15 @@ double CalculateSquaredReprojectionError(const Eigen::Vector2d& point2D,
                                          const Eigen::Vector3d& point3D,
                                          const Rigid3d& cam_from_world,
                                          const Camera& camera) {
+  // step: 1 P_c = T_c_w * P_w
   const Eigen::Vector3d point3D_in_cam = cam_from_world * point3D;
 
-  // Check that point is infront of camera.
+  // step: 2 Check that point is infront of camera.
   if (point3D_in_cam.z() < std::numeric_limits<double>::epsilon()) {
     return std::numeric_limits<double>::max();
   }
 
+  // step: 3 uv err
   return (camera.ImgFromCam(point3D_in_cam.hnormalized()) - point2D)
       .squaredNorm();
 }

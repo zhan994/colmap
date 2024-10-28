@@ -46,6 +46,7 @@ namespace colmap {
 // The reprojection error is the Euclidean distance between the observation
 // in the image and the projection of the 3D point into the image. If the
 // 3D point is behind the camera, then this function returns DBL_MAX.
+// api: 计算重投影误差
 double CalculateSquaredReprojectionError(const Eigen::Vector2d& point2D,
                                          const Eigen::Vector3d& point3D,
                                          const Rigid3d& cam_from_world,
