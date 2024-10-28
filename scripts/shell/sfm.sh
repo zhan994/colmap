@@ -10,6 +10,7 @@ echo "$(log_time) feature extractor..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
   --ImageReader.camera_model OPENCV \
+  --ImageReader.camera_params "552.23198503638389,553.3633964901785,270,270,0.18643355235419351,-0.19986311220817557,-0.0011286505008237298,-0.00026876497068803516" \
   --SiftExtraction.use_gpu 1 \
   --SiftExtraction.max_image_size 1024 \
   --SiftExtraction.max_num_features 1000 \
@@ -28,8 +29,8 @@ mkdir -p ${PROJECT}/sparse
 echo "$(log_time) colmap mapper..."
 ./build/src/colmap/exe/colmap mapper \
   --Mapper.ba_refine_principal_point 0 \
-  --Mapper.ba_refine_focal_length 1 \
-  --Mapper.ba_refine_extra_params 1 \
+  --Mapper.ba_refine_focal_length 0 \
+  --Mapper.ba_refine_extra_params 0 \
   --Mapper.ba_local_max_num_iterations 50 \
   --Mapper.ba_global_max_num_iterations 100 \
   --database_path ${PROJECT}/database.db \
