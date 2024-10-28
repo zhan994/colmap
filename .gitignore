@@ -44,4 +44,4 @@ vcpkg_installed/
 *.out
 *.app
 
-proj/
+proj*/
