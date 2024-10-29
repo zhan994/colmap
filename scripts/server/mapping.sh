@@ -12,14 +12,14 @@ echo "$(log_time) convert protobuf to database..."
 python3 scripts/server/database.py
 
 echo "$(log_time) feature matcher..."
-./build/src/colmap/exe/colmap sequential_matcher \
+/root/colmap_detailed/build/src/colmap/exe/colmap sequential_matcher \
   --SequentialMatching.overlap 10  \
   --SiftMatching.use_gpu 0 \
   --database_path ${PROJECT}/database.db
 echo "$(log_time) feature exhaustive_matcher done."
 
 echo "$(log_time) glomap mapper..."
-./build/glomap/glomap mapper \
+/root/glomap/build/glomap mapper \
   --database_path ${PROJECT}/database.db \
   --image_path ${PROJECT}/images \
   --output_path ${PROJECT}/sparse
@@ -31,7 +31,7 @@ echo "$(log_time) csv conversion done."
 
 mkdir -p ${PROJECT}/sparse/0_aligned_enu
 echo "$(log_time) ENU align..."
-./build/src/colmap/exe/colmap model_aligner \
+/root/colmap_detailed/build/src/colmap/exe/colmap model_aligner \
     --input_path  ${PROJECT}/sparse/0 \
     --output_path  ${PROJECT}/sparse/0_aligned_enu \
     --ref_images_path ${PROJECT}/gps.txt \
@@ -41,7 +41,7 @@ echo "$(log_time) ENU align..."
 echo "$(log_time) ENU align done."
 
 echo "$(log_time) export ENU as txt..."
-./build/src/colmap/exe/colmap model_converter \
+/root/colmap_detailed/build/src/colmap/exe/colmap model_converter \
     --input_path ${PROJECT}/sparse/0_aligned_enu \
     --output_path ${PROJECT}/sparse/0_aligned_enu \
     --output_type TXT
@@ -49,7 +49,7 @@ echo "$(log_time) export ENU as txt done."
 
 mkdir -p ${PROJECT}/sparse/0_aligned_ecef
 echo "$(log_time) ECEF align..."
-./build/src/colmap/exe/colmap model_aligner \
+/root/colmap_detailed/build/src/colmap/exe/colmap model_aligner \
     --input_path  ${PROJECT}/sparse/0 \
     --output_path  ${PROJECT}/sparse/0_aligned_ecef \
     --ref_images_path ${PROJECT}/gps.txt \
@@ -59,7 +59,7 @@ echo "$(log_time) ECEF align..."
 echo "$(log_time) ECEF align done."
 
 echo "$(log_time) export ECEF as txt..."
-./build/src/colmap/exe/colmap model_converter \
+/root/colmap_detailed/build/src/colmap/exe/colmap model_converter \
     --input_path ${PROJECT}/sparse/0_aligned_ecef \
     --output_path ${PROJECT}/sparse/0_aligned_ecef \
     --output_type TXT
@@ -76,3 +76,5 @@ python3 scripts/python/colmap_quat_csv.py \
   ${PROJECT}/sparse/0_aligned_enu/images_Twc.txt \
   ${PROJECT}/photo_record_quat1.csv
 echo "$(log_time) photo_record_quat1.csv generation done."
+
+    
