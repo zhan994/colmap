@@ -6,8 +6,10 @@ log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }
 
+protoc --python_out=scripts/server mapper.proto
+
 echo "$(log_time) convert protobuf to database..."
-python3 ${PROJECT}/database.py
+python3 scripts/server/database.py
 
 echo "$(log_time) feature matcher..."
 ./build/src/colmap/exe/colmap sequential_matcher \
@@ -24,7 +26,7 @@ echo "$(log_time) glomap mapper..."
 echo "$(log_time) glomap mapper done."
 
 echo "$(log_time) convert csv to gps..."
-python3 csv_to_gps.py ${PROJECT}/photo_record.csv ${PROJECT}/gps.txt
+python3 scripts/python/csv_to_gps.py ${PROJECT}/photo_record.csv ${PROJECT}/gps.txt
 echo "$(log_time) csv conversion done."
 
 mkdir -p ${PROJECT}/sparse/0_aligned_enu
@@ -64,8 +66,8 @@ echo "$(log_time) export ECEF as txt..."
 echo "$(log_time) export ECEF as txt done."
 
 echo "$(log_time) convert camera pose from Tcw to Twc..."
-python3 convert_pose.py ${PROJECT}/sparse/0_aligned_enu/cameras.txt ${PROJECT}/sparse/0_aligned_enu/cameras_twc.txt
-python3 convert_pose.py ${PROJECT}/sparse/0_aligned_ecef/cameras.txt ${PROJECT}/sparse/0_aligned_ecef/cameras_twc.txt
+python3 scripts/python/colmap_pose.py ${PROJECT}/sparse/0_aligned_enu/images.txt ${PROJECT}/sparse/0_aligned_enu/images_twc.txt
+python3 scripts/python/colmap_pose.py ${PROJECT}/sparse/0_aligned_ecef/images.txt ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt
 echo "$(log_time) camera pose conversion done."
 
 echo "$(log_time) generate photo_record_quat1.csv..."
