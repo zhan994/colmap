@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package topxgun.protocol.apollo.mapper.V1;
+
+option  java_package = "com.topxgun.protocol.apollo.mapper.V1";
+option  java_outer_classname = "ProtoMapper";
+
+enum MapperMode
+{
+  ONLINE  = 0;       
+  OFFLINE = 1;
+}
+
+message Start{
+  MapperMode mode = 1;
+  string id       = 2;
+}
+
+message ProcessingInfo
+{
+  uint32 progress      = 1;
+  string result        = 2;
+  double lt_merct_x    = 3;
+  double lt_merct_y    = 4;
+  double x_gsd         = 5;
+  double y_gsd         = 6;
+}
+
+message CameraMsg
+{
+  uint32 id = 1;
+  uint32 model_id = 2;
+  uint32 width = 3;
+  uint32 height = 4;
+  repeated float params = 5;
+  bool has_prior_focal_length = 6;
+}
+
+message ImageMsg{
+  uint32 id = 1;
+  string name = 2;
+  uint32 camera_id = 3;
+  bool registered = 4;
+  uint32 width = 5;
+  uint32 height = 6;
+  uint32 channels = 7;
+  bytes data = 8;
+  // uint32 num_points3D = 5;
+  // uint32 num_observations = 6;
+  // uint32 num_correspondences_ = 7;
+  // uint32 num_visible_points3D = 8;
+}
+
+message FeatureKeypointMsg
+{
+  float x = 1;
+  float y = 2;
+  float a11 = 3;
+  float a12 = 4;
+  float a21 = 5;
+  float a22 = 6;
+}
+
+message FeatureDescriptorMsg
+{
+  uint32 rows = 1;
+  uint32 cols = 2;
+  bytes data = 3;
+}
+
+message FeatureMsg
+{
+  CameraMsg camera = 1;
+  ImageMsg image = 2;
+  repeated FeatureKeypointMsg keypoints = 3;
+  FeatureDescriptorMsg descriptors = 4;
+}
