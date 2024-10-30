@@ -118,6 +118,8 @@ def apply_offset_to_ecef(gps_file_path, images_twc_file_path, output_file_path, 
 
             # Convert updated ECEF to GPS and print
             updated_lat, updated_lon, updated_alt = ecef_to_gps(updated_x, updated_y, updated_z)
+            # fix alt
+            updated_alt = orig_alt
             print(f"Updated GPS coordinates for {filename}: ({updated_lat:.6f}, {updated_lon:.6f}, {updated_alt:.6f})\n")
 
             # Replace the old ECEF values in the line with the updated ones

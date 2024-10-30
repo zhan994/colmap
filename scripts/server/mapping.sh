@@ -6,7 +6,7 @@ log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }
 
-protoc --python_out=/root/colmaptzt/colmap_detailed/scripts/server/ mapper.proto
+protoc --python_out=/root/colmaptzt/colmap_detailed/scripts/server/ /root/colmaptzt/colmap_detailed/scripts/server/mapper.proto
 
 echo "$(log_time) convert protobuf to database..."
 python3 /root/colmaptzt/colmap_detailed/scripts/server/database.py
