@@ -30,7 +30,7 @@ echo "$(log_time) glomap mapper..."
 echo "$(log_time) glomap mapper done."
 
 echo "$(log_time) convert csv to gps..."
-python3 /root/colmaptzt/colmap_detailed/scripts/python/csv_to_gps.py ${PROJECT}/photo_record.csv ${PROJECT}/gps.txt
+python3 /root/colmaptzt/colmap_detailed/scripts/python/csv_to_gps.py ${PROTOBUF_PATH}/photo_record.csv ${PROJECT}/gps.txt
 echo "$(log_time) csv conversion done."
 
 mkdir -p ${PROJECT}/sparse/0_aligned_enu
