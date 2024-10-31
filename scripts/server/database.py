@@ -345,10 +345,10 @@ def process_all_bin_files(protobuf_dir, database_path):
 # Example Usage:
 if __name__ == "__main__":
     # protobuf_dir = "./protobuf_0.1-1500"
-    # database_path = "database.db"
+    database_path = "database.db"
 
     protobuf_dir = sys.argv[1]
-    database_path = sys.argv[2]
+    # database_path = sys.argv[2]
 
     # 检查目录是否存在
     if not os.path.exists(protobuf_dir):
