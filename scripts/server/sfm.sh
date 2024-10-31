@@ -1,7 +1,10 @@
 #!/bin/sh
 
-PROJECT="${PWD}"
+
 PROTOBUF_PATH="$1"
+PROJECT="${PROTOBUF_PATH}/proj"
+
+mkdir -p ${PROJECT}
 
 log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
@@ -10,7 +13,7 @@ log_time() {
 protoc --proto_path=/root/colmaptzt/colmap_detailed/scripts/server --python_out=/root/colmaptzt/colmap_detailed/scripts/server/ /root/colmaptzt/colmap_detailed/scripts/server/mapper.proto
 
 echo "$(log_time) convert protobuf to database..."
-python3 /root/colmaptzt/colmap_detailed/scripts/server/database.py "$PROTOBUF_PATH"
+python3 /root/colmaptzt/colmap_detailed/scripts/server/database.py ${PROTOBUF_PATH} ${PROJECT}/database.db
 
 echo "$(log_time) feature matcher..."
 /root/colmap_detailed/build/src/colmap/exe/colmap sequential_matcher \
