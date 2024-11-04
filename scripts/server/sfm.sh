@@ -1,10 +1,11 @@
 #!/bin/sh
 
-
 PROTOBUF_PATH="$1"
 PROJECT="${PROTOBUF_PATH}/proj"
+IMAGE="${PROJECT}/images"
 
 mkdir -p ${PROJECT}
+mkdir -p ${IMAGE}
 
 log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
@@ -14,6 +15,9 @@ protoc --proto_path=/root/colmaptzt/colmap_detailed/scripts/server --python_out=
 
 echo "$(log_time) convert protobuf to database..."
 python3 /root/colmaptzt/colmap_detailed/scripts/server/database.py ${PROTOBUF_PATH} ${PROJECT}/database.db
+
+echo "$(log_time) convert protobuf to images..."
+python3 /root/colmaptzt/colmap_detailed/scripts/server/extract_images.py ${PROTOBUF_PATH} ${IMAGE}
 
 echo "$(log_time) feature matcher..."
 /root/colmap_detailed/build/src/colmap/exe/colmap sequential_matcher \
@@ -25,7 +29,7 @@ echo "$(log_time) feature exhaustive_matcher done."
 echo "$(log_time) glomap mapper..."
 /root/glomap/build/glomap/glomap mapper \
   --database_path ${PROJECT}/database.db \
-  --image_path ${PROJECT}/images \
+  --image_path ${IMAGE} \
   --output_path ${PROJECT}/sparse
 echo "$(log_time) glomap mapper done."
 
