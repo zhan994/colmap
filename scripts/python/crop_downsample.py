@@ -1,3 +1,7 @@
+'''
+    Crop and Downsample Images
+    Zhihao Zhan
+'''
 import cv2
 import os
 import sys

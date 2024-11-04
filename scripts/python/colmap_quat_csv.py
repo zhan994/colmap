@@ -1,5 +1,6 @@
 """
-   'photo_record_quat.csv' using colmap pose in aligned_ecef and aligned_enu
+    'photo_record_quat.csv' using colmap pose in aligned_ecef and aligned_enu
+    Zhihao Zhan
 """
 import csv
 import os

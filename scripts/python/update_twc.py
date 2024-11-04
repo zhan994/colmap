@@ -1,3 +1,7 @@
+'''
+    Update TWC coordinates with minimum offset based on GPS coordinates
+    Zhituo Tu
+'''
 import numpy as np
 import sys
 

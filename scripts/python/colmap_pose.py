@@ -1,5 +1,6 @@
 """
-  convert colmap camera pose from Tcw to Twc
+    convert colmap camera pose from Tcw to Twc
+    Zhihao Zhan
 """
 import numpy as np
 from scipy.spatial.transform import Rotation as R 

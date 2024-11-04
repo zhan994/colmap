@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# script to align gps in text file
+# Zhihao Zhan
+
 log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }

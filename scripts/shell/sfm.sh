@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# script to run sfm in colmap
+# Zhihao Zhan
+
 log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }

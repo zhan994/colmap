@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# script to run feature extractor and feature matcher
+# Zhihao Zhan
+
 log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }

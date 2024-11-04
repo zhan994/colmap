@@ -7,7 +7,5 @@
 4.将colmap的pose数据从Tcw转为Twc
   python3 scripts/python/colmap_pose.py proj/sparse/0_aligned_enu/images.txt proj/sparse/0_aligned_enu/images_Twc.txt
   python3 scripts/python/colmap_pose.py proj/sparse/0_aligned_ecef/images.txt proj/sparse/0_aligned_ecef/images_Twc.txt
-5.用colmap的enu_pose更新photo_record.csv的ned欧拉角
-  python3 scripts/python/update_quat_csv.py proj/photo_record.csv proj/sparse/0_aligned_enu/images_Twc.txt proj/photo_record_quat.csv
-6.合成与photo_record.csv格式相同的文件
+5.合成与photo_record.csv格式相同的文件
   python3 scripts/python/colmap_quat_csv.py proj/sparse/0_aligned_ecef/images_Twc.txt proj/sparse/0_aligned_enu/images_Twc.txt proj/photo_record_quat1.csv
