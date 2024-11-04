@@ -11,13 +11,13 @@ log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }
 
-protoc --proto_path=/root/colmaptzt/colmap_detailed/scripts/server --python_out=/root/colmaptzt/colmap_detailed/scripts/server/ /root/colmaptzt/colmap_detailed/scripts/server/mapper.proto
+protoc --proto_path=/root/colmap_detailed/scripts/server --python_out=/root/colmap_detailed/scripts/server/ /root/colmap_detailed/scripts/server/mapper.proto
 
 echo "$(log_time) convert protobuf to database..."
-python3 /root/colmaptzt/colmap_detailed/scripts/server/database.py ${PROTOBUF_PATH} ${PROJECT}/database.db
+python3 /root/colmap_detailed/scripts/server/database.py ${PROTOBUF_PATH} ${PROJECT}/database.db
 
 echo "$(log_time) convert protobuf to images..."
-python3 /root/colmaptzt/colmap_detailed/scripts/server/extract_images.py ${PROTOBUF_PATH} ${IMAGE}
+python3 /root/colmap_detailed/scripts/server/extract_images.py ${PROTOBUF_PATH} ${IMAGE}
 
 echo "$(log_time) feature matcher..."
 /root/colmap_detailed/build/src/colmap/exe/colmap sequential_matcher \
@@ -34,7 +34,9 @@ echo "$(log_time) glomap mapper..."
 echo "$(log_time) glomap mapper done."
 
 echo "$(log_time) convert csv to gps..."
-python3 /root/colmaptzt/colmap_detailed/scripts/python/csv_to_gps.py ${PROTOBUF_PATH}/photo_record.csv ${PROJECT}/gps.txt
+python3 /root/colmap_detailed/scripts/python/csv_to_gps.py \
+  ${PROTOBUF_PATH}/photo_record.csv \
+  ${PROJECT}/gps.txt
 echo "$(log_time) csv conversion done."
 
 mkdir -p ${PROJECT}/sparse/0_aligned_enu
@@ -74,16 +76,23 @@ echo "$(log_time) export ECEF as txt..."
 echo "$(log_time) export ECEF as txt done."
 
 echo "$(log_time) convert camera pose from Tcw to Twc..."
-python3 /root/colmaptzt/colmap_detailed/scripts/python/colmap_pose.py ${PROJECT}/sparse/0_aligned_enu/images.txt ${PROJECT}/sparse/0_aligned_enu/images_twc.txt
-python3 /root/colmaptzt/colmap_detailed/scripts/python/colmap_pose.py ${PROJECT}/sparse/0_aligned_ecef/images.txt ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt
+python3 /root/colmap_detailed/scripts/python/colmap_pose.py \
+  ${PROJECT}/sparse/0_aligned_enu/images.txt \
+  ${PROJECT}/sparse/0_aligned_enu/images_twc.txt
+python3 /root/colmap_detailed/scripts/python/colmap_pose.py \
+  ${PROJECT}/sparse/0_aligned_ecef/images.txt \
+  ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt
 echo "$(log_time) camera pose conversion done."
 
 echo "$(log_time) ...update images_twc.txt"
-python3 /root/colmaptzt/colmap_detailed/scripts/python/update_twc.py ${PROJECT}/gps.txt ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt
+python3 /root/colmap_detailed/scripts/python/update_twc.py \
+  ${PROJECT}/gps.txt \
+  ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt \
+  ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt
 echo "$(log_time) update ECEF done"
 
 echo "$(log_time) generate photo_record_quat1.csv..."
-python3 /root/colmaptzt/colmap_detailed/scripts/python/colmap_quat_csv.py \
+python3 /root/colmap_detailed/scripts/python/colmap_quat_csv.py \
   ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt \
   ${PROJECT}/sparse/0_aligned_enu/images_twc.txt \
   ${PROJECT}/photo_record_quat1.csv
