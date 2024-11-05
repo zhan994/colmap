@@ -33,7 +33,7 @@ def save_images_from_feature_msgs(input_folder, output_folder):
                     image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
 
                 # 保存为JPEG文件
-                output_filename = os.path.join(output_folder, image_msg.name.decode('utf-8'))
+                output_filename = os.path.join(output_folder, image_msg.name)
                 cv2.imwrite(output_filename, image_array)
                 print(f"Saved: {output_filename}")
 
