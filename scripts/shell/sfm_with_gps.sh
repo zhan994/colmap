@@ -86,22 +86,22 @@ echo "$(log_time) export ECEF as txt done."
 echo "$(log_time) convert camera pose from Tcw to Twc..."
 python3 scripts/python/colmap_pose.py \
   ${PROJECT}/sparse/0_aligned_enu/images.txt \
-  ${PROJECT}/sparse/0_aligned_enu/images_twc.txt
+  ${PROJECT}/sparse/0_aligned_enu/images_Twc.txt
 python3 scripts/python/colmap_pose.py \
   ${PROJECT}/sparse/0_aligned_ecef/images.txt \
-  ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt
+  ${PROJECT}/sparse/0_aligned_ecef/images_Twc.txt
 echo "$(log_time) camera pose conversion done."
 
-echo "$(log_time) ...update images_twc.txt"
-python3 scripts/python/update_twc.py \
+echo "$(log_time) ...update images_Twc.txt"
+python3 scripts/python/update_Twc.py \
   ${PROJECT}/gps.txt \
-  ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt \
-  ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt
+  ${PROJECT}/sparse/0_aligned_ecef/images_Twc.txt \
+  ${PROJECT}/sparse/0_aligned_ecef/images_Twc.txt
 echo "$(log_time) update ECEF done"
 
 echo "$(log_time) generate photo_record_quat1.csv..."
 python3 scripts/python/colmap_quat_csv.py \
-  ${PROJECT}/sparse/0_aligned_ecef/images_twc.txt \
-  ${PROJECT}/sparse/0_aligned_enu/images_twc.txt \
+  ${PROJECT}/sparse/0_aligned_ecef/images_Twc.txt \
+  ${PROJECT}/sparse/0_aligned_enu/images_Twc.txt \
   ${PROJECT}/photo_record_quat1.csv
 echo "$(log_time) photo_record_quat1.csv generation done."
