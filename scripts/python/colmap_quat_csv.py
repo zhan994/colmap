@@ -93,7 +93,7 @@ def colmap_ecef(ecef_file_path):
         if data_list[0] == "POINT":
             px, py, pz = map(float, data_list[1:4])
             lon, lat, alt = transform(ecef, wgs84, px, py, pz, radians=False)
-            points.append((lon, lat, alt))
+            points.append((lat, lon, alt))
         else:
             qw, qx, qy, qz, tx, ty, tz = map(float, data_list[1:8])
             fn = data_list[9]
@@ -134,8 +134,8 @@ def write_photo_csv(frames, frame_names, points, output_file_path):
             writer.writerow(new_row)
 
         for i in range(len(points)):
-            lon, lat, alt = points[i]
-            new_row = ["POINT", lon, lat, alt]
+            lat, lon, alt = points[i]
+            new_row = ["POINT", lat, lon, alt]
             writer.writerow(new_row)
 
 
