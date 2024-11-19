@@ -81,6 +81,7 @@ def photo_record_csv_to_frames(input_file_path):
 def colmap_ecef(ecef_file_path):
     frames = []
     frame_names = []
+    points = []
     lines = []
     with open(ecef_file_path, 'r') as input:
         lines = input.readlines()
@@ -89,13 +90,18 @@ def colmap_ecef(ecef_file_path):
     wgs84 = Proj(proj='latlong', ellps='WGS84', datum='WGS84')
     for i, line in enumerate(lines):
         data_list = line.strip().split()
-        qw, qx, qy, qz, tx, ty, tz = map(float, data_list[1:8])
-        fn = data_list[9]
-        lon, lat, alt = transform(ecef, wgs84, tx, ty, tz, radians=False)
-        f = Frame(lat, lon, alt, qw, qx, qy, qz)
-        frames.append(f)
-        frame_names.append(fn)
-    return frames, frame_names
+        if data_list[0] == "POINT":
+            px, py, pz = map(float, data_list[1:4])
+            lon, lat, alt = transform(ecef, wgs84, px, py, pz, radians=False)
+            points.append((lon, lat, alt))
+        else:
+            qw, qx, qy, qz, tx, ty, tz = map(float, data_list[1:8])
+            fn = data_list[9]
+            lon, lat, alt = transform(ecef, wgs84, tx, ty, tz, radians=False)
+            f = Frame(lat, lon, alt, qw, qx, qy, qz)
+            frames.append(f)
+            frame_names.append(fn)
+    return frames, frame_names, points
 
 
 def colmap_enu(frames, frame_names, enu_file_path):
@@ -108,24 +114,28 @@ def colmap_enu(frames, frame_names, enu_file_path):
         qw, qx, qy, qz = map(float, data_list[1:5])
         fn = data_list[9]
         ind = frame_names.index(fn)
-        print("before:", R.from_quat(
-            frames[ind].quat()).as_euler('zxy', degrees=True))
+        # print("before:", R.from_quat(
+        #     frames[ind].quat()).as_euler('zxy', degrees=True))
         frames[ind].from_quat(qw, qx, qy, qz)
-        print("update:", R.from_quat(
-            frames[ind].quat()).as_euler('zxy', degrees=True))
+        # print("update:", R.from_quat(
+        #     frames[ind].quat()).as_euler('zxy', degrees=True))
 
     return frames, frame_names
 
 
-def write_photo_csv(frames, frame_names, output_file_path):
-    cnt = len(frames)
+def write_photo_csv(frames, frame_names, points, output_file_path):
     with open(output_file_path, mode='w', newline='', encoding='utf-8') as outfile:
         writer = csv.writer(outfile, delimiter=' ')
-        for i in range(cnt):
+        for i in range(len(frames)):
             fn = frame_names[i]
             lat, lon, alt = frames[i].llh()
             qx, qy, qz, qw = frames[i].quat()
             new_row = [fn, lat, lon, alt, qw, qx, qy, qz]
+            writer.writerow(new_row)
+
+        for i in range(len(points)):
+            lon, lat, alt = points[i]
+            new_row = ["POINT", lon, lat, alt]
             writer.writerow(new_row)
 
 
@@ -140,10 +150,9 @@ if __name__ == "__main__":
 
     frames = []
     frame_names = []
-    frames, frame_names = colmap_ecef(colmap_ecef_file_path)
+    points = []
+    frames, frame_names, points = colmap_ecef(colmap_ecef_file_path)
     frames, frame_names = colmap_enu(frames, frame_names, colmap_enu_file_path)
-    write_photo_csv(frames, frame_names, output_file_path)
+    write_photo_csv(frames, frame_names, points, output_file_path)
 
     # frames, frame_names = photo_record_csv_to_frames(input_file_path)
-
-   
