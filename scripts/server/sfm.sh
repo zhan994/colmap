@@ -20,19 +20,23 @@ echo "$(log_time) convert protobuf to images..."
 python3 /root/colmap_detailed/scripts/server/extract_images.py ${PROTOBUF_PATH} ${IMAGE}
 
 echo "$(log_time) feature matcher..."
-/root/colmap_detailed/build/src/colmap/exe/colmap sequential_matcher \
-  --SequentialMatching.overlap 10  \
+/root/colmap_detailed/build/src/colmap/exe/colmap exhaustive_matcher\
   --SiftMatching.use_gpu 0 \
   --database_path ${PROJECT}/database.db
 echo "$(log_time) feature exhaustive_matcher done."
 
 mkdir -p ${PROJECT}/sparse
-echo "$(log_time) glomap mapper..."
-/root/glomap/build/glomap/glomap mapper \
+echo "$(log_time) colmap mapper..."
+/root/colmap_detailed/build/src/colmap/exe/colmap mapper \
+  --Mapper.ba_refine_principal_point 0 \
+  --Mapper.ba_refine_focal_length 0 \
+  --Mapper.ba_refine_extra_params 0 \
+  --Mapper.ba_local_max_num_iterations 50 \
+  --Mapper.ba_global_max_num_iterations 100 \
   --database_path ${PROJECT}/database.db \
   --image_path ${IMAGE} \
   --output_path ${PROJECT}/sparse
-echo "$(log_time) glomap mapper done."
+echo "$(log_time) colmap mapper done."
 
 echo "$(log_time) convert csv to gps..."
 python3 /root/colmap_detailed/scripts/python/csv_to_gps.py \
