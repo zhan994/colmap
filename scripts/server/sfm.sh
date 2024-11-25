@@ -31,8 +31,8 @@ echo "$(log_time) colmap mapper..."
   --Mapper.ba_refine_principal_point 0 \
   --Mapper.ba_refine_focal_length 0 \
   --Mapper.ba_refine_extra_params 0 \
-  --Mapper.ba_local_max_num_iterations 50 \
-  --Mapper.ba_global_max_num_iterations 100 \
+  --Mapper.ba_local_max_num_iterations 25 \
+  --Mapper.ba_global_max_num_iterations 50 \
   --database_path ${PROJECT}/database.db \
   --image_path ${IMAGE} \
   --output_path ${PROJECT}/sparse

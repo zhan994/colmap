@@ -13,17 +13,16 @@ echo "$(log_time) feature extractor..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
   --ImageReader.camera_model OPENCV \
-  --ImageReader.camera_params "552.23198503638389,553.3633964901785,270,270,0.18643355235419351,-0.19986311220817557,-0.0011286505008237298,-0.00026876497068803516" \
+  --ImageReader.camera_params "615.0, 615.0, 270, 270, 0.15, -0.12, 0.00, 0.00" \
   --SiftExtraction.use_gpu 1 \
   --SiftExtraction.max_image_size 1024 \
-  --SiftExtraction.max_num_features 1000 \
+  --SiftExtraction.max_num_features 3000 \
   --database_path ${PROJECT}/database.db \
   --image_path ${PROJECT}/images
 echo "$(log_time) feature_extractor done."
 
 echo "$(log_time) feature matcher..."
-./build/src/colmap/exe/colmap sequential_matcher \
-  --SequentialMatching.overlap 10  \
+./build/src/colmap/exe/colmap exhaustive_matcher\
   --SiftMatching.use_gpu 1 \
   --database_path ${PROJECT}/database.db
 echo "$(log_time) feature exhaustive_matcher done."
@@ -34,8 +33,8 @@ echo "$(log_time) colmap mapper..."
   --Mapper.ba_refine_principal_point 0 \
   --Mapper.ba_refine_focal_length 0 \
   --Mapper.ba_refine_extra_params 0 \
-  --Mapper.ba_local_max_num_iterations 50 \
-  --Mapper.ba_global_max_num_iterations 100 \
+  --Mapper.ba_local_max_num_iterations 25 \
+  --Mapper.ba_global_max_num_iterations 50 \
   --database_path ${PROJECT}/database.db \
   --image_path ${PROJECT}/images \
   --output_path ${PROJECT}/sparse
@@ -93,15 +92,16 @@ python3 scripts/python/colmap_pose.py \
 echo "$(log_time) camera pose conversion done."
 
 echo "$(log_time) ...update images_Twc.txt"
-python3 scripts/python/update_Twc.py \
+python3 ./scripts/python/update_Twc.py \
   ${PROJECT}/gps.txt \
   ${PROJECT}/sparse/0_aligned_ecef/images_Twc.txt \
-  ${PROJECT}/sparse/0_aligned_ecef/images_Twc.txt
+  ${PROJECT}/sparse/0_aligned_ecef/points3D.txt \
+  ${PROJECT}/sparse/0_aligned_ecef/images_Twc_updated.txt
 echo "$(log_time) update ECEF done"
 
 echo "$(log_time) generate photo_record_quat1.csv..."
-python3 scripts/python/colmap_quat_csv.py \
-  ${PROJECT}/sparse/0_aligned_ecef/images_Twc.txt \
+python3 ./scripts/python/colmap_quat_csv.py \
+  ${PROJECT}/sparse/0_aligned_ecef/images_Twc_updated.txt \
   ${PROJECT}/sparse/0_aligned_enu/images_Twc.txt \
   ${PROJECT}/photo_record_quat1.csv
 echo "$(log_time) photo_record_quat1.csv generation done."
