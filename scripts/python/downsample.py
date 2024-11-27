@@ -6,7 +6,7 @@ import cv2
 import os
 import sys
 
-def crop_and_downsample_images(input_folder_path, output_folder_path, crop_width, crop_height):
+def downsample_images(input_folder_path, output_folder_path):
     # 确保输出文件夹存在
     if not os.path.exists(output_folder_path):
         os.makedirs(output_folder_path)
@@ -18,18 +18,8 @@ def crop_and_downsample_images(input_folder_path, output_folder_path, crop_width
             image_path = os.path.join(input_folder_path, filename)
             image = cv2.imread(image_path)
             
-            # 获取图片尺寸
-            height, width = image.shape[:2]
-            
-            # 计算裁剪的起始点（以中心为基准）
-            start_x = max(width // 2 - crop_width // 2, 0)
-            start_y = max(height // 2 - crop_height // 2, 0)
-            
-            # 裁剪图片
-            cropped_image = image[start_y:start_y+crop_height, start_x:start_x+crop_width]
-            
             # 降采样1/2
-            downsampled_image = cv2.pyrDown(cropped_image)
+            downsampled_image = cv2.pyrDown(image)
             
             # 构建输出文件名
             
@@ -46,9 +36,7 @@ if __name__ == "__main__":
 
     input_folder_path = sys.argv[1]
     output_folder_path = sys.argv[2]
-    crop_width = 1080
-    crop_height = 1080
 
-    crop_and_downsample_images(input_folder_path, output_folder_path, crop_width, crop_height)
+    downsample_images(input_folder_path, output_folder_path)
 
     print("Done cropping and downsampling images.")

@@ -8,12 +8,14 @@ log_time() {
 }
 
 PROJECT="${PWD}/proj"
+python3 scripts/python/camera_mask.py 960 540 200 250 ${PROJECT}/camera_mask.png
 
 echo "$(log_time) feature extractor..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
+  --ImageReader.camera_mask ${PROJECT}/camera_mask.png \
   --ImageReader.camera_model OPENCV \
-  --ImageReader.camera_params "615.0, 615.0, 270, 270, 0.15, -0.12, 0.00, 0.00" \
+  --ImageReader.camera_params "615.0, 615.0, 480, 270, 0.15, -0.12, 0.00, 0.00" \
   --SiftExtraction.use_gpu 1 \
   --SiftExtraction.max_image_size 1024 \
   --SiftExtraction.max_num_features 3000 \

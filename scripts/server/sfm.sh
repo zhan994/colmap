@@ -21,7 +21,7 @@ python3 /root/colmap_detailed/scripts/server/extract_images.py ${PROTOBUF_PATH} 
 
 echo "$(log_time) feature matcher..."
 /root/colmap_detailed/build/src/colmap/exe/colmap exhaustive_matcher\
-  --SiftMatching.use_gpu 0 \
+  --SiftMatching.use_gpu 1 \
   --database_path ${PROJECT}/database.db
 echo "$(log_time) feature exhaustive_matcher done."
 
