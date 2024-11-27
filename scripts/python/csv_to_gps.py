@@ -22,7 +22,7 @@ def csv_to_txt(input_file_path, output_file_path):
             # 遍历原始文件的每一行
             for row in reader:
                 # 提取文件路径中的文件名
-                line = row[0] + ','+ row[1]
+                line = row[0]
                 parts = line.strip().split()
                 file_path = parts[0]
                 file_name = os.path.basename(file_path)
