@@ -1,5 +1,5 @@
 """
-    convert colmap camera pose from Tcw to Twc
+    将 colmap camera pose 由 Tcw 转为 Twc
     Zhihao Zhan
 """
 import numpy as np

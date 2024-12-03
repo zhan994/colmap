@@ -1,3 +1,7 @@
+"""
+    从protobuf二进制文件中提取图像数据
+    Zhihao Zhan
+"""
 import os
 import cv2
 import numpy as np

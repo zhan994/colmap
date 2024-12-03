@@ -1,5 +1,5 @@
 '''
-   write gps info for images and downsample.
+   GPS 信息写入图片并下采样
    Zhihao Zhan
 '''
 
@@ -38,7 +38,7 @@ def add_exif_location(image_path, lat, lon, alt):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python write_exif.py <dir>")
+        print("Usage: python exif_downsample.py <input_dir>")
         sys.exit(1)
 
     input_dir = sys.argv[1]
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     files = [f for f in files if f.endswith(".jpeg")]
     files.sort()
 
-    output_dir = input_dir + "_GPS"
+    output_dir = input_dir + "_GPS_Downsample"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     

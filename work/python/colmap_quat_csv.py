@@ -1,5 +1,5 @@
 """
-    'photo_record_quat.csv' using colmap pose in aligned_ecef and aligned_enu
+    'photo_record_quat.csv' 结合aligned_ecef的位置和aligned_enu的姿态
     Zhihao Zhan
 """
 import csv
@@ -34,49 +34,6 @@ class Frame:
 
     def llh(self):
         return self.lat, self.lon, self.alt
-
-
-def photo_record_csv_to_frames(input_file_path):
-    frames = []
-    frame_names = []
-    # 打开原始CSV文件进行读取
-    with open(input_file_path, mode='r', newline='', encoding='utf-8') as infile:
-        # 使用csv.reader读取CSV文件，但需要处理文件路径中的逗号
-        reader = csv.reader(
-            [_f for _f in infile.read().splitlines()], delimiter=',')
-
-        # 跳过前两行
-        next(reader, None)
-        next(reader, None)
-
-        # 遍历原始文件的每一行
-        for row in reader:
-            # 提取文件路径中的文件名
-            line = row[0] + ',' + row[1]
-            parts = line.strip().split()
-            file_path = parts[0]
-            file_name = os.path.basename(file_path)
-            roll, pitch, yaw = map(float, parts[4:7])
-            Rz = R.from_euler("z", yaw, degrees=True)
-            Ry = R.from_euler("y", pitch, degrees=True)
-            Rx = R.from_euler("x", roll, degrees=True)
-            R_ned_body = Rz * Ry * Rx
-            R_body_camera = R.from_euler("z", -90.0, degrees=True)
-
-            Rz0 = R.from_euler("z", 90.0, degrees=True)
-            Ry0 = R.from_euler("y", 0.0, degrees=True)
-            Rx0 = R.from_euler("x", 180.0, degrees=True)
-            R_enu_ned = Rz0 * Ry0 * Rx0
-
-            R_enu_camera = R_enu_ned * R_ned_body * R_body_camera
-            qx, qy, qz, qw = R_enu_camera.as_quat()
-            lat, lon, alt = map(float, parts[1:4])
-            f = Frame(lat, lon, alt, qw, qx, qy, qz)
-            frames.append(f)
-            frame_names.append(file_name)
-
-    return frames, frame_names
-
 
 def colmap_ecef(ecef_file_path):
     frames = []
@@ -154,5 +111,3 @@ if __name__ == "__main__":
     frames, frame_names, points = colmap_ecef(colmap_ecef_file_path)
     frames, frame_names = colmap_enu(frames, frame_names, colmap_enu_file_path)
     write_photo_csv(frames, frame_names, points, output_file_path)
-
-    # frames, frame_names = photo_record_csv_to_frames(input_file_path)

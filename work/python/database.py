@@ -1,3 +1,6 @@
+"""
+    COLMAP Database 解析
+"""
 import os
 import mapper_pb2
 

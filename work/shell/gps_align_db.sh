@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# script to align gps in database
+# 基于database对齐地理位置
 # Zhihao Zhan
 
 log_time() {

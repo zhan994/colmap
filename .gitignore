@@ -45,3 +45,4 @@ vcpkg_installed/
 *.app
 
 proj*/
+*pb2.py

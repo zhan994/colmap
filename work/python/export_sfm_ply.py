@@ -1,5 +1,5 @@
 """
-    Export SfM data to PLY format
+    将 `points3D.txt` 文件转为 ply 文件
     Zhihao Zhan
 """
 

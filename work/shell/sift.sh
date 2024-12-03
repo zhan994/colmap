@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# script to run feature extractor and feature matcher
+# 特征提取
 # Zhihao Zhan
 
 log_time() {
@@ -9,7 +9,7 @@ log_time() {
 
 PROJECT="${PWD}/proj"
 
-echo "$(log_time) feature extractor..."
+echo "$(log_time) feature extractor ..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
   --ImageReader.camera_model OPENCV \
@@ -21,7 +21,7 @@ echo "$(log_time) feature extractor..."
   --image_path ${PROJECT}/images
 echo "$(log_time) feature_extractor done."
 
-echo "$(log_time) feature matcher..."
+echo "$(log_time) feature matcher ..."
 ./build/src/colmap/exe/colmap sequential_matcher \
   --SequentialMatching.overlap 10  \
   --SiftMatching.use_gpu 1 \

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# script to align gps in text file
+# 基于`gps.txt`对齐地理位置
 # Zhihao Zhan
 
 log_time() {

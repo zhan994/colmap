@@ -1,8 +1,9 @@
 '''
-  visualize gps.txt
+  可视化 `gps.txt` 的 UTM 轨迹
   Zhihao Zhan
 '''
 
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from pyproj import Transformer
@@ -28,4 +29,9 @@ def vis_traj(gps_txt_file):
 
 
 if __name__ == "__main__":
-  vis_traj("proj/gps.txt")
+  if len(sys.argv) != 2:
+        print("Usage: python script.py <gps.txt path>")
+        sys.exit(1)
+
+  input_file_path = sys.argv[1]
+  vis_traj(input_file_path)

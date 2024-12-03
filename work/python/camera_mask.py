@@ -1,5 +1,5 @@
 '''
-  generate camera_mask.png to del feats
+  生成 `camera_mask.png` 用于过滤图像左右下角落的飞机脚架遮挡
   Zhihao Zhan
 '''
 

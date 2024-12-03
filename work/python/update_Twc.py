@@ -1,5 +1,5 @@
 '''
-    Update TWC coordinates with minimum offset based on GPS coordinates
+    根据 GPS/RTK 提供的位置信息纠正 colmap 输出的位置坐标系统误差
     Zhihao Zhan
 '''
 import numpy as np
@@ -139,7 +139,7 @@ def apply_offset_to_ecef(gps_file_path, images_twc_file_path, point3d_file_path,
             # Apply the offset
             updated_x = ecef_x + avg_x_offset
             updated_y = ecef_y + avg_y_offset
-            updated_z = ecef_z
+            updated_z = ecef_z + avg_z_offset
             # Convert updated ECEF to GPS and print
             updated_lat, updated_lon, updated_alt = ecef_to_gps(
                 updated_x, updated_y, updated_z)

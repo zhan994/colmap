@@ -1,5 +1,5 @@
 """
-    convert 'photo_record.csv' to 'gps.txt' for model_aligner
+    将'photo_record.csv'转为'gps.txt'用于model_aligner
     Zhihao Zhan
 """
 import csv
