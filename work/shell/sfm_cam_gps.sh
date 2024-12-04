@@ -45,7 +45,7 @@ echo "$(log_time) colmap mapper ..."
 echo "$(log_time) colmap mapper done."
 
 # echo "$(log_time) glomap mapper ..."
-# ./build/simple_glomap mapper \
+# ../simple_glomap/build/simple_glomap mapper \
 #   --database_path ${PROJECT}/database.db \
 #   --image_path ${PROJECT}/images \
 #   --output_path ${PROJECT}/sparse
