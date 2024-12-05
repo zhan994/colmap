@@ -23,7 +23,6 @@ def convert_to_degrees(value):
     s = convert_fraction_to_float(seconds)
     return d + (m / 60.0) + (s / 3600.0)
 
-
 def get_exif_info(image_path):
     """获取图片的EXIF信息"""
     if not os.path.exists(image_path):
@@ -49,14 +48,15 @@ def get_exif_info(image_path):
         print("缺少纬度或经度信息")
         return None, None, None
 
-    lat_ref = gps_info.get(piexif.GPSIFD.GPSLatitudeRef)
-    lon_ref = gps_info.get(piexif.GPSIFD.GPSLongitudeRef)
+    lat_ref = gps_info.get(piexif.GPSIFD.GPSLatitudeRef).decode()
+    lon_ref = gps_info.get(piexif.GPSIFD.GPSLongitudeRef).decode()
     latitude = convert_to_degrees(latitude)
     longitude = convert_to_degrees(longitude)
-
     if lat_ref == 'S':
+        print(lat_ref)
         latitude = -latitude
     if lon_ref == 'W':
+        print(lon_ref)
         longitude = -longitude
 
     # 处理海拔高度
@@ -86,6 +86,7 @@ def process_images(folder_path, txt_file):
         if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
             image_path = os.path.join(folder_path, filename)
             latitude, longitude, altitude = get_exif_info(image_path)
+            print(latitude, longitude, altitude)
             if latitude is not None and longitude is not None:
                 data.append((filename, latitude, longitude, altitude))
     save_to_txt(data, txt_file)

@@ -158,7 +158,8 @@ def apply_offset_to_ecef(gps_file_path, images_twc_file_path, point3d_file_path,
             px, py, pz = point
             updated_px = px + avg_x_offset
             updated_py = py + avg_y_offset
-            file.write(f"POINT {updated_px} {updated_py} {pz}\n")
+            updated_pz = pz + avg_z_offset
+            file.write(f"POINT {updated_px} {updated_py} {updated_pz}\n")
 
     print(
         f"Offset applied. Updated coordinates saved to '{output_file_path}'.")
