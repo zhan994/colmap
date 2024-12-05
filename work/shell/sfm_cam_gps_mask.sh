@@ -8,13 +8,15 @@ log_time() {
 }
 
 PROJECT="${PWD}/proj"
+python3 work/python/camera_mask.py 960 540 200 250 ${PROJECT}/camera_mask.png
 python3 work/python/exif_to_gps.py ${PROJECT}/images ${PROJECT}/gps.txt
 
 echo "$(log_time) feature extractor ..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
+  --ImageReader.camera_mask ${PROJECT}/camera_mask.png \
   --ImageReader.camera_model OPENCV \
-  --ImageReader.camera_params "3716.25,3716.11,2639.56,1962.19,-0.10,-0.01,0.0,-0.0" \
+  --ImageReader.camera_params "3716.2575775281393, 3716.1114704670836, 2639.5648205725929, 1962.1973365330105, -0.10287103597145282, -0.017408108357317358, -5.9160707243943791e-05, -0.00010785254872742507" \
   --SiftExtraction.use_gpu 1 \
   --SiftExtraction.max_image_size 1024 \
   --SiftExtraction.max_num_features 3000 \
