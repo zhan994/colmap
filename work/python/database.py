@@ -264,7 +264,7 @@ class COLMAPDatabase(sqlite3.Connection):
                 array_to_blob(tvec),
             ),
         )
-    
+
     # 检查相机是否已经存在
     def camera_exists(self, model, width, height, params):
         params_blob = array_to_blob(np.asarray(params, np.float64))
@@ -275,13 +275,13 @@ class COLMAPDatabase(sqlite3.Connection):
         result = cursor.fetchone()
         return result[0] if result else None
 
-    def add_feature_message(self, feature_msg):
+    def add_feature_message(self, feature_msg, cam_param):
         # 1. 添加相机信息，如果已存在则获取现有相机ID
         existing_camera_id = self.camera_exists(
             model=4,
             width=feature_msg.camera.width,
             height=feature_msg.camera.height,
-            params=feature_msg.camera.params
+            params=cam_param
         )
 
         if existing_camera_id:
@@ -291,7 +291,7 @@ class COLMAPDatabase(sqlite3.Connection):
                 model=4,
                 width=feature_msg.camera.width,
                 height=feature_msg.camera.height,
-                params=feature_msg.camera.params,
+                params=cam_param,
                 prior_focal_length=feature_msg.camera.has_prior_focal_length
             )
 
@@ -303,7 +303,8 @@ class COLMAPDatabase(sqlite3.Connection):
 
         # 3. 添加关键点
         keypoints = np.array(
-            [[kp.x, kp.y, kp.a11, kp.a12, kp.a21, kp.a22] for kp in feature_msg.keypoints],
+            [[kp.x, kp.y, kp.a11, kp.a12, kp.a21, kp.a22]
+                for kp in feature_msg.keypoints],
             dtype=np.float32
         )
         self.add_keypoints(image_id, keypoints)
@@ -313,7 +314,8 @@ class COLMAPDatabase(sqlite3.Connection):
             feature_msg.descriptors.rows, feature_msg.descriptors.cols)
         self.add_descriptors(image_id, descriptors)
 
-def insert_feature_msg_to_db(database_path, serialized_data):
+
+def insert_feature_msg_to_db(database_path, serialized_data, cam_param):
     # 连接数据库
     db = COLMAPDatabase.connect(database_path)
 
@@ -325,25 +327,27 @@ def insert_feature_msg_to_db(database_path, serialized_data):
     parsed_feature_msg.ParseFromString(serialized_data)
 
     # 将解析的数据插入数据库
-    db.add_feature_message(parsed_feature_msg)
+    db.add_feature_message(parsed_feature_msg, cam_param)
 
     # 提交并关闭数据库
     db.commit()
     db.close()
 
-def process_all_bin_files(protobuf_dir, database_path):
+
+def process_all_bin_files(protobuf_dir, cam_param, database_path):
     # 遍历指定目录下的所有 .bin 文件
     for file_name in os.listdir(protobuf_dir):
         if file_name.endswith(".bin"):
             file_path = os.path.join(protobuf_dir, file_name)
             print(f"Processing file: {file_path}")
-            
+
             # 从文件中读取序列化的数据
             with open(file_path, "rb") as f:
                 serialized_data = f.read()
-            
+
             # 将数据插入到数据库中
-            insert_feature_msg_to_db(database_path, serialized_data)
+            insert_feature_msg_to_db(database_path, serialized_data, cam_param)
+
 
 # Example Usage:
 if __name__ == "__main__":
@@ -351,12 +355,15 @@ if __name__ == "__main__":
     # database_path = "database.db"
 
     protobuf_dir = sys.argv[1]
-    database_path = sys.argv[2]
+    cam_param_str = sys.argv[2]
+    database_path = sys.argv[3]
 
+    numbers = [float(num) for num in cam_param_str.split(",")]
+    cam_param = np.array(numbers)
     # 检查目录是否存在
     if not os.path.exists(protobuf_dir):
         print(f"Error: Directory {protobuf_dir} does not exist.")
         exit(1)
 
     # 处理目录下所有 .bin 文件并插入数据库
-    process_all_bin_files(protobuf_dir, database_path)
+    process_all_bin_files(protobuf_dir, cam_param, database_path)

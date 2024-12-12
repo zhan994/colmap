@@ -10,10 +10,12 @@ log_time() {
 
 PROJECT="${PWD}/proj"
 CAM_PARAM="$1"
+python3 work/python/camera_mask.py 960 540 200 250 ${PROJECT}/camera_mask.png
 
 echo "$(log_time) feature extractor ..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
+  --ImageReader.camera_mask ${PROJECT}/camera_mask.png \
   --ImageReader.camera_model OPENCV \
   --ImageReader.camera_params ${CAM_PARAM} \
   --SiftExtraction.use_gpu 1 \

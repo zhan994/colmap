@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# 估计内外参的sfm
+# 估计内外参的sfm，colmap目录下准备好proj文件夹以及图片
+# ./work/shell/sfm.sh
 # Zhihao Zhan
 
 log_time() {
@@ -9,12 +10,9 @@ log_time() {
 
 PROJECT="${PWD}/proj"
 
-python3 work/python/camera_mask.py 960 540 200 250 ${PROJECT}/camera_mask.png
-
 echo "$(log_time) feature extractor ..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
-  --ImageReader.camera_mask ${PROJECT}/camera_mask.png \
   --ImageReader.camera_model OPENCV \
   --SiftExtraction.use_gpu 1 \
   --SiftExtraction.max_image_size 1024 \
@@ -41,3 +39,17 @@ echo "$(log_time) colmap mapper ..."
   --image_path ${PROJECT}/images \
   --output_path ${PROJECT}/sparse
 echo "$(log_time) colmap mapper done."
+
+echo "$(log_time) processing sparse folder..."
+LARGEST_FOLDER=$(find ${PROJECT}/sparse/* -maxdepth 0 -type d -print0 | xargs -0 du -sb | sort -n -r | head -n 1 | awk '{print $2}')
+if [ -z ${LARGEST_FOLDER} ]; then
+    echo "$(log_time) no valid sparse folder found!"
+    exit 1
+fi
+echo "$(log_time) largest folder is ${LARGEST_FOLDER}, export data as txt ..."
+mv ${LARGEST_FOLDER} ${PROJECT}/sparse/valid
+./build/src/colmap/exe/colmap model_converter \
+    --input_path ${PROJECT}/sparse/valid \
+    --output_path ${PROJECT}/sparse/valid \
+    --output_type TXT
+echo "$(log_time) Parameter path: ${PROJECT}/sparse/valid/camera.txt"

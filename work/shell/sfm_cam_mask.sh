@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # 固定内参共享的SFM，colmap目录下准备好proj文件夹以及图片
-# ./work/shell/sfm_cam.sh fx,fy,cx,cy,k1,k2,p1,p2
+# ./work/shell/sfm_cam_mask.sh fx,fy,cx,cy,k1,k2,p1,p2
 # Zhihao Zhan
 
 log_time() {
@@ -10,10 +10,12 @@ log_time() {
 
 PROJECT="${PWD}/proj"
 CAM_PARAM="$1"
+python3 work/python/camera_mask.py 960 540 200 250 ${PROJECT}/camera_mask.png
 
 echo "$(log_time) feature extractor ..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
+  --ImageReader.camera_mask ${PROJECT}/camera_mask.png \
   --ImageReader.camera_model OPENCV \
   --ImageReader.camera_params ${CAM_PARAM} \
   --SiftExtraction.use_gpu 1 \
