@@ -8,8 +8,8 @@ log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }
 
-PROJECT="${PWD}/proj"
-CAM_PARAM="$1"
+PROJECT=${PWD}/proj
+CAM_PARAM=$1
 python3 work/python/camera_mask.py 960 540 200 250 ${PROJECT}/camera_mask.png
 
 echo "$(log_time) feature extractor ..."

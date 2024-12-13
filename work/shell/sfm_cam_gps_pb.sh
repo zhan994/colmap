@@ -8,10 +8,10 @@ log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }
 
-PROTOBUF_PATH="$1"
-CAM_PARAM="$2"
-PROJECT="${PROTOBUF_PATH}/proj"
-IMAGE="${PROJECT}/images"
+PROTOBUF_PATH=$1
+CAM_PARAM=$2
+PROJECT=${PROTOBUF_PATH}/proj
+IMAGE=${PROJECT}/images
 
 mkdir -p ${PROJECT}
 mkdir -p ${IMAGE}

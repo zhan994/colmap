@@ -8,8 +8,8 @@ log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }
 
-PROJECT="${PWD}/proj"
-CAM_PARAM="$1"
+PROJECT=${PWD}/proj
+CAM_PARAM=$1
 python3 work/python/exif_to_gps.py ${PROJECT}/images ${PROJECT}/gps.txt
 
 echo "$(log_time) feature extractor ..."

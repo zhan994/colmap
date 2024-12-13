@@ -1,31 +1,27 @@
 #!/bin/sh
 
-# 固定内参共享的SFM，并GPS信息对齐，colmap目录下准备好proj文件夹以及图片
-# /root/colmap_detailed/work/shell/sfm_cam_gps_server.sh images_folder fx,fy,cx,cy,k1,k2,p1,p2
+# 固定内参共享的SFM，并GPS信息对齐，输入为封装后特征点protobuf文件
+# /root/colmap_detailed/work/shell/serv_sfm_cam_gps_pb.sh protobuf_path fx,fy,cx,cy,k1,k2,p1,p2
 # Zhihao Zhan
 
 log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }
 
-FP="$1"
-CAM_PARAM="$2"
-PROJECT="${FP}/proj"
-mkdir -p ${PROJECT}/images
-mv ${FP}/*.JPG ${PROJECT}/images
-python3 /root/colmap_detailed/work/python/exif_to_gps.py ${PROJECT}/images ${PROJECT}/gps.txt
+PROTOBUF_PATH=$1
+CAM_PARAM=$2
+PROJECT=${PROTOBUF_PATH}/proj
+IMAGE=${PROJECT}/images
 
-echo "$(log_time) feature extractor ..."
-/root/colmap_detailed/build/src/colmap/exe/colmap feature_extractor \
-  --ImageReader.single_camera 1 \
-  --ImageReader.camera_model OPENCV \
-  --ImageReader.camera_params ${CAM_PARAM} \
-  --SiftExtraction.use_gpu 1 \
-  --SiftExtraction.max_image_size 1024 \
-  --SiftExtraction.max_num_features 3000 \
-  --database_path ${PROJECT}/database.db \
-  --image_path ${PROJECT}/images
-echo "$(log_time) feature_extractor done."
+mkdir -p ${PROJECT}
+mkdir -p ${IMAGE}
+python3 /root/colmap_detailed/work/python/csv_to_gps.py ${PROTOBUF_PATH}/photo_record.csv ${PROJECT}/gps.txt
+
+protoc --proto_path=/root/colmap_detailed/work/proto/ --python_out=/root/colmap_detailed/work/python/ /root/colmap_detailed/work/proto/mapper.proto
+echo "$(log_time) convert protobuf to database ..."
+python3 /root/colmap_detailed/work/python/database.py ${PROTOBUF_PATH} ${CAM_PARAM} ${PROJECT}/database.db
+echo "$(log_time) convert protobuf to images..."
+python3 /root/colmap_detailed/work/python/extract_images.py ${PROTOBUF_PATH} ${IMAGE}
 
 echo "$(log_time) feature matcher ..."
 /root/colmap_detailed/build/src/colmap/exe/colmap exhaustive_matcher \
@@ -42,7 +38,7 @@ echo "$(log_time) colmap mapper ..."
   --Mapper.ba_local_max_num_iterations 25 \
   --Mapper.ba_global_max_num_iterations 50 \
   --database_path ${PROJECT}/database.db \
-  --image_path ${PROJECT}/images \
+  --image_path ${IMAGE} \
   --output_path ${PROJECT}/sparse
 echo "$(log_time) colmap mapper done."
 
@@ -100,7 +96,7 @@ echo "$(log_time) convert camera pose from Tcw to Twc ..."
 python3 /root/colmap_detailed/work/python/colmap_pose.py \
   ${PROJECT}/sparse/valid_aligned_enu/images.txt \
   ${PROJECT}/sparse/valid_aligned_enu/images_Twc.txt
-python3 work/python/colmap_pose.py \
+python3 /root/colmap_detailed/work/python/colmap_pose.py \
   ${PROJECT}/sparse/valid_aligned_ecef/images.txt \
   ${PROJECT}/sparse/valid_aligned_ecef/images_Twc.txt
 echo "$(log_time) camera pose conversion done."

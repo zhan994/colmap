@@ -8,7 +8,7 @@ log_time() {
     date "+%Y-%m-%d %H:%M:%S:%3N"
 }
 
-PROJECT="${PWD}/proj"
+PROJECT=${PWD}/proj
 
 echo "$(log_time) feature extractor ..."
 ./build/src/colmap/exe/colmap feature_extractor \
