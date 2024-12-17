@@ -9,6 +9,7 @@ log_time() {
 }
 
 PROTOBUF_PATH=$1
+PB_LIST_TXT=${PROTOBUF_PATH}/pb_list.txt
 PROJECT=${PROTOBUF_PATH}/proj_param
 IMAGE=${PROJECT}/images
 
@@ -18,7 +19,7 @@ python3 /root/colmap_detailed/work/python/camera_mask.py 960 540 200 250 ${PROJE
 
 protoc --proto_path=/root/colmap_detailed/work/proto/ --python_out=/root/colmap_detailed/work/python/ /root/colmap_detailed/work/proto/mapper.proto
 echo "$(log_time) convert protobuf to images..."
-python3 /root/colmap_detailed/work/python/extract_images.py ${PROTOBUF_PATH} ${IMAGE}
+python3 /root/colmap_detailed/work/python/extract_images_txt.py ${PB_LIST_TXT} ${IMAGE}
 
 echo "$(log_time) feature extractor ..."
 /root/colmap_detailed/build/src/colmap/exe/colmap feature_extractor \
