@@ -111,6 +111,7 @@ echo "$(log_time) update images_Twc.txt done."
 
 echo "$(log_time) generate photo_record_quat.csv ..."
 python3 work/python/colmap_quat_csv.py \
+  ${CAM_PARAM} \
   ${PROJECT}/sparse/valid_aligned_ecef/images_Twc_updated.txt \
   ${PROJECT}/sparse/valid_aligned_enu/images_Twc.txt \
   ${PROJECT}/photo_record_quat.csv

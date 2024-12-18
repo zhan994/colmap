@@ -80,9 +80,14 @@ def colmap_enu(frames, frame_names, enu_file_path):
     return frames, frame_names
 
 
-def write_photo_csv(frames, frame_names, points, output_file_path):
+def write_photo_csv(frames, cam_params, frame_names, points, output_file_path):
     with open(output_file_path, mode='w', newline='', encoding='utf-8') as outfile:
         writer = csv.writer(outfile, delimiter=' ')
+        
+        fx, fy, cx, cy, k1, k2, p1, p2 = map(float, cam_params)
+        new_row = ["PARAM", fx, fy, cx, cy, k1, k2, p1, p2]
+        writer.writerow(new_row)
+
         for i in range(len(frames)):
             fn = frame_names[i]
             lat, lon, alt = frames[i].llh()
@@ -97,17 +102,19 @@ def write_photo_csv(frames, frame_names, points, output_file_path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python script.py <colmap_ecef_file_path> <colmap_enu_file_path>  <output_file_path>")
+    if len(sys.argv) != 5:
+        print("Usage: python script.py <cam_params> <colmap_ecef_file_path> <colmap_enu_file_path>  <output_file_path>")
         sys.exit(1)
 
-    colmap_ecef_file_path = sys.argv[1]
-    colmap_enu_file_path = sys.argv[2]
-    output_file_path = sys.argv[3]
+    cam_params_str = sys.argv[1]
+    colmap_ecef_file_path = sys.argv[2]
+    colmap_enu_file_path = sys.argv[3]
+    output_file_path = sys.argv[4]
 
+    cam_params = cam_params_str.strip().split(',')
     frames = []
     frame_names = []
     points = []
     frames, frame_names, points = colmap_ecef(colmap_ecef_file_path)
     frames, frame_names = colmap_enu(frames, frame_names, colmap_enu_file_path)
-    write_photo_csv(frames, frame_names, points, output_file_path)
+    write_photo_csv(frames, cam_params, frame_names, points, output_file_path)
