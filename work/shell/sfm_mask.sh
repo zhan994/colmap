@@ -55,3 +55,5 @@ mv ${LARGEST_FOLDER} ${PROJECT}/sparse/valid
     --output_path ${PROJECT}/sparse/valid \
     --output_type TXT
 echo "$(log_time) Parameter path: ${PROJECT}/sparse/valid/camera.txt"
+
+python3 work/python/check_sfm.py ${PROJECT}/sparse/valid/images.txt ${PROJECT}/images
