@@ -16,6 +16,8 @@ IMAGE=${PROJECT}/images
 mkdir -p ${PROJECT}
 mkdir -p ${IMAGE}
 
+python3 work/python/calib_wp.py ${PROTOBUF_PATH}/photo_record.csv 30 ${PB_LIST_TXT}
+
 protoc --proto_path=work/proto/ --python_out=work/python/ work/proto/mapper.proto 
 echo "$(log_time) convert protobuf to images..."
 python3 work/python/extract_images_txt.py ${PB_LIST_TXT} ${IMAGE}

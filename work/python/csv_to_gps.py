@@ -16,9 +16,8 @@ def csv_to_txt(input_file_path, output_file_path):
         next(reader, None)
         next(reader, None)
         
-        # 打开新CSV文件进行写入
+        # 打开新文件进行写入
         with open(output_file_path, mode='w', newline='', encoding='utf-8') as outfile:
-            writer = csv.writer(outfile)
             # 遍历原始文件的每一行
             for row in reader:
                 # 提取文件路径中的文件名
