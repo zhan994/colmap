@@ -74,11 +74,14 @@ bool VerifySiftGPUParams(bool use_gpu);
 bool VerifyCameraParams(const std::string& camera_model,
                         const std::string& params);
 
-int RunFeatureExtractor(int argc, char** argv); // api: feature_extractor入口函数
+// api: feature_extractor入口函数
+int RunFeatureExtractor(int argc, char** argv);
 int RunFeatureImporter(int argc, char** argv);
+// api: exhaustive_matcher入口函数
 int RunExhaustiveMatcher(int argc, char** argv);
 int RunMatchesImporter(int argc, char** argv);
-int RunSequentialMatcher(int argc, char** argv); // api: sequential_matcher入口函数
+// api: sequential_matcher入口函数
+int RunSequentialMatcher(int argc, char** argv);
 int RunSpatialMatcher(int argc, char** argv);
 int RunTransitiveMatcher(int argc, char** argv);
 int RunVocabTreeMatcher(int argc, char** argv);

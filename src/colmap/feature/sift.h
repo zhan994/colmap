@@ -34,6 +34,7 @@
 
 namespace colmap {
 
+// api: Sift特征提取参数
 struct SiftExtractionOptions {
   // Number of threads for feature extraction.
   int num_threads = -1;
@@ -46,11 +47,14 @@ struct SiftExtractionOptions {
   std::string gpu_index = "-1";
 
   // Maximum image size, otherwise image will be down-scaled.
+  // 最大图像尺寸，否则降采样
   int max_image_size = 3200;
 
   // Maximum number of features to detect, keeping larger-scale features.
+  // 最大特征数，保留较大尺度的特征
   int max_num_features = 8192;
 
+  // Octave相关参数
   // First octave in the pyramid, i.e. -1 upsamples the image by one level.
   int first_octave = -1;
 
@@ -68,9 +72,11 @@ struct SiftExtractionOptions {
 
   // Estimate affine shape of SIFT features in the form of oriented ellipses as
   // opposed to original SIFT which estimates oriented disks.
+  // 是否estimate_affine_shape，原始版本估计 oriented disks
   bool estimate_affine_shape = false;
 
   // Maximum number of orientations per keypoint if not estimate_affine_shape.
+  // 不做 estimate_affine_shape 时的每个特征点的最大方向数量
   int max_num_orientations = 2;
 
   // Fix the orientation to 0 for upright features.
@@ -78,6 +84,7 @@ struct SiftExtractionOptions {
 
   // Whether to adapt the feature detection depending on the image darkness.
   // Note that this feature is only available in the OpenGL SiftGPU version.
+  // note: 仅支持OpenGL版本的SiftGPU
   bool darkness_adaptivity = false;
 
   // Domain-size pooling parameters. Domain-size pooling computes an average
@@ -96,6 +103,9 @@ struct SiftExtractionOptions {
   // Otherwise, the covariant implementation is only used when
   // estimate_affine_shape or domain_size_pooling are enabled, since the normal
   // Sift implementation is faster.
+  // 是否强制使用covariant的特征提取
+  // 否则默认在estimate_affine_shape和domain_size_pooling使能时采用
+  // note: 普通的Sift更快
   bool force_covariant_extractor = false;
 
   enum class Normalization {
