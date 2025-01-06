@@ -47,7 +47,7 @@ def pca(points):
 
     # 2. 计算协方差矩阵
     cov_matrix = np.cov(centered_data, rowvar=False)
-    print(cov_matrix.shape)
+    # print(cov_matrix.shape)
 
     # 3. 特征值分解
     eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
@@ -66,14 +66,15 @@ def get_calib_wp_file(wp_arr, num, thresold):
     for i in range(wp_size - num + 1):
         points = wp_arr[i:i+num, :]
         lam1_div_lam0 = pca(points)
+        print(lam1_div_lam0)
         if lam1_div_lam0 > thresold:
             idx = i
             break
 
     pb_list = []
-    if idx > 0:
+    if idx >= 0:
         for i in range(num):
-            pb_fn = str(idx + i + 1) + ".bin"
+            pb_fn = str(idx + i) + ".bin"
             pb_list.append(pb_fn)
 
     return pb_list
