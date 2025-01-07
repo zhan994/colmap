@@ -118,6 +118,8 @@ class SiftCPUFeatureExtractor : public FeatureExtractor {
 
   explicit SiftCPUFeatureExtractor(const SiftExtractionOptions& options)
       : options_(options), sift_(nullptr, &vl_sift_delete) {
+    std::cout << "new sift cpu (vlfeat),,, " << std::endl;
+
     THROW_CHECK(options_.Check());
     THROW_CHECK(!options_.estimate_affine_shape);
     THROW_CHECK(!options_.domain_size_pooling);
@@ -131,13 +133,13 @@ class SiftCPUFeatureExtractor : public FeatureExtractor {
     return std::make_unique<SiftCPUFeatureExtractor>(options);
   }
 
-  
   bool Extract(const Bitmap& bitmap,
                FeatureKeypoints* keypoints,
                FeatureDescriptors* descriptors) {
     THROW_CHECK(bitmap.IsGrey());
     THROW_CHECK_NOTNULL(keypoints);
 
+    // step: 1 创建 sift
     if (sift_ == nullptr || sift_->width != bitmap.Width() ||
         sift_->height != bitmap.Height()) {
       sift_ = VlSiftType(vl_sift_new(bitmap.Width(),
@@ -151,6 +153,7 @@ class SiftCPUFeatureExtractor : public FeatureExtractor {
       }
     }
 
+    // step: 2 设置 peak/edge 阈值
     vl_sift_set_peak_thresh(sift_.get(), options_.peak_threshold);
     vl_sift_set_edge_thresh(sift_.get(), options_.edge_threshold);
 
@@ -311,6 +314,7 @@ class SiftCPUFeatureExtractor : public FeatureExtractor {
   VlSiftType sift_;
 };
 
+// api: Covariant SIFT CPU 特征提取类
 class CovariantSiftCPUFeatureExtractor : public FeatureExtractor {
  public:
   explicit CovariantSiftCPUFeatureExtractor(
@@ -515,9 +519,11 @@ class CovariantSiftCPUFeatureExtractor : public FeatureExtractor {
   const SiftExtractionOptions options_;
 };
 
+// api: （重点）SIFT GPU 特征提取类
 #if defined(COLMAP_GPU_ENABLED)
 // Mutexes that ensure that only one thread extracts/matches on the same GPU
 // at the same time, since SiftGPU internally uses static variables.
+// note: 确保同一时刻只有一个线程跑在同一个GPU上
 static std::map<int, std::unique_ptr<std::mutex>> sift_gpu_mutexes_;
 
 class SiftGPUFeatureExtractor : public FeatureExtractor {
@@ -610,9 +616,12 @@ class SiftGPUFeatureExtractor : public FeatureExtractor {
 
     std::vector<const char*> sift_gpu_args_cstr;
     sift_gpu_args_cstr.reserve(sift_gpu_args.size());
+    std::cout << "sift_gpu cmd: ";
     for (const auto& arg : sift_gpu_args) {
       sift_gpu_args_cstr.push_back(arg.c_str());
+      std::cout << arg << " ";
     }
+    std::cout << std::endl;
 
     auto extractor = std::make_unique<SiftGPUFeatureExtractor>(options);
 
@@ -624,6 +633,8 @@ class SiftGPUFeatureExtractor : public FeatureExtractor {
                                     sift_gpu_args_cstr.data());
 
     extractor->sift_gpu_.gpu_index = gpu_indices[0];
+
+    // 创建gpu对应的互斥锁
     if (sift_gpu_mutexes_.count(gpu_indices[0]) == 0) {
       sift_gpu_mutexes_.emplace(gpu_indices[0], std::make_unique<std::mutex>());
     }
@@ -639,18 +650,22 @@ class SiftGPUFeatureExtractor : public FeatureExtractor {
   bool Extract(const Bitmap& bitmap,
                FeatureKeypoints* keypoints,
                FeatureDescriptors* descriptors) override {
+    std::cout << "extract feat. using sift_gpu,,," << std::endl;
+    
     THROW_CHECK(bitmap.IsGrey());
     THROW_CHECK_NOTNULL(keypoints);
     THROW_CHECK_NOTNULL(descriptors);
 
     // Note the max dimension of SiftGPU is the maximum dimension of the
     // first octave in the pyramid (which is the 'first_octave').
+    // step: 1 计算第一组的系数，若为first_octave=-1，即上采样factor=2
     const int compensation_factor = 1 << -std::min(0, options_.first_octave);
     THROW_CHECK_EQ(options_.max_image_size * compensation_factor,
                    sift_gpu_.GetMaxDimension());
 
     std::lock_guard<std::mutex> lock(*sift_gpu_mutexes_[sift_gpu_.gpu_index]);
 
+    // step: 2 调用SIFT
     // Note, that this produces slightly different results than using SiftGPU
     // directly for RGB->GRAY conversion, since it uses different weights.
     const std::vector<uint8_t> bitmap_raw_bits = bitmap.ConvertToRawBits();
@@ -665,8 +680,9 @@ class SiftGPUFeatureExtractor : public FeatureExtractor {
       return false;
     }
 
+    // step: 3 获取结果数据
     const size_t num_features = static_cast<size_t>(sift_gpu_.GetFeatureNum());
-
+    // std::cout << "feat. num: " << num_features << std::endl;
     keypoints_buffer_.resize(num_features);
 
     FeatureDescriptorsFloat descriptors_float(num_features, 128);

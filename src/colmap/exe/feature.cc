@@ -72,6 +72,7 @@ bool VerifySiftGPUParams(const bool use_gpu) {
 
 void UpdateImageReaderOptionsFromCameraMode(ImageReaderOptions& options,
                                             CameraMode mode) {
+  std::cout << "update image reader options from camera mode,,, " << std::endl;
   switch (mode) {
     case CameraMode::AUTO:
       options.single_camera = false;
@@ -97,7 +98,8 @@ void UpdateImageReaderOptionsFromCameraMode(ImageReaderOptions& options,
 }
 
 int RunFeatureExtractor(int argc, char** argv) {
-  // step: 1 options
+  std::cout << "run feature extractor,,," << std::endl;
+  // step: 1 参数配置
   std::string image_list_path;
   int camera_mode = -1;
   std::string descriptor_normalization = "l1_root";
@@ -116,6 +118,8 @@ int RunFeatureExtractor(int argc, char** argv) {
   ImageReaderOptions reader_options = *options.image_reader;
   reader_options.database_path = *options.database_path;
   reader_options.image_path = *options.image_path;
+  std::cout << "database path: " << reader_options.database_path << std::endl
+            << "image_path: " << reader_options.image_path << std::endl;
 
   if (camera_mode >= 0) {
     UpdateImageReaderOptionsFromCameraMode(reader_options,
@@ -123,6 +127,7 @@ int RunFeatureExtractor(int argc, char** argv) {
   }
 
   StringToLower(&descriptor_normalization);
+  std::cout << "desc. norm: " << descriptor_normalization << std::endl;
   if (descriptor_normalization == "l1_root") {
     options.sift_extraction->normalization =
         SiftExtractionOptions::Normalization::L1_ROOT;

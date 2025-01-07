@@ -54,14 +54,16 @@ struct SiftExtractionOptions {
   // 最大特征数，保留较大尺度的特征
   int max_num_features = 8192;
 
-  // Octave相关参数
   // First octave in the pyramid, i.e. -1 upsamples the image by one level.
+  // 第一组id
   int first_octave = -1;
 
   // Number of octaves.
+  // 最小的Octave至少有16×16个像素，num_octaves = log2[min(img_h, img_w)] - 2
   int num_octaves = 4;
 
   // Number of levels per octave.
+  // 一共 octave_res + 3 个, [-1, octave_res + 1]
   int octave_resolution = 3;
 
   // Peak threshold for detection.
@@ -84,7 +86,7 @@ struct SiftExtractionOptions {
 
   // Whether to adapt the feature detection depending on the image darkness.
   // Note that this feature is only available in the OpenGL SiftGPU version.
-  // note: 仅支持OpenGL版本的SiftGPU
+  // 仅支持OpenGL版本的SiftGPU
   bool darkness_adaptivity = false;
 
   // Domain-size pooling parameters. Domain-size pooling computes an average

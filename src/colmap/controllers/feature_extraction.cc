@@ -111,6 +111,7 @@ class ImageResizerThread : public Thread {
 
  private:
   void Run() override {
+    std::cout << "run image resizer thread,,," << std::endl;
     while (true) {
       if (IsStopped()) {
         break;
@@ -138,10 +139,12 @@ class ImageResizerThread : public Thread {
         }
 
         output_queue_->Push(std::move(image_data));
+        // std::cout << "extractor thread data + 1" << std::endl;
       } else {
         break;
       }
     }
+    // std::cout << "exit image resizer thread." << std::endl;
   }
 
   const int max_image_size_;
@@ -173,6 +176,7 @@ class SiftFeatureExtractorThread : public Thread {
  private:
   // api: 特征提取线程主函数
   void Run() override {
+    std::cout << "run feature extractor thread,,," << std::endl;
     if (sift_options_.use_gpu) {
 #if !defined(COLMAP_CUDA_ENABLED)
       THROW_CHECK_NOTNULL(opengl_context_);
@@ -228,10 +232,13 @@ class SiftFeatureExtractorThread : public Thread {
         image_data.bitmap.Deallocate();
 
         output_queue_->Push(std::move(image_data));
+        // std::cout << "writer thread data + 1" << std::endl;
       } else {
         break;
       }
     }
+
+    // std::cout << "exit feature extractor thread." << std::endl;
   }
 
   const SiftExtractionOptions sift_options_;
@@ -256,6 +263,8 @@ class FeatureWriterThread : public Thread {
  private:
   // api: 特征输出线程主函数
   void Run() override {
+    std::cout << "run feature writer thread,,," << std::endl;
+
     size_t image_index = 0;
     while (true) {
       if (IsStopped()) {
@@ -268,13 +277,14 @@ class FeatureWriterThread : public Thread {
         auto& image_data = input_job.Data();
 
         image_index += 1;
-        
+
         LOG(INFO) << StringPrintf(
             "Processed file [%d/%d]", image_index, num_images_);
 
         LOG(INFO) << StringPrintf("  Name:            %s",
                                   image_data.image.Name().c_str());
 
+        // step: 打印数据状态
         if (image_data.status == ImageReader::Status::IMAGE_EXISTS) {
           LOG(INFO) << "  SKIP: Features for image already extracted.";
         } else if (image_data.status == ImageReader::Status::BITMAP_ERROR) {
@@ -312,6 +322,7 @@ class FeatureWriterThread : public Thread {
                                   image_data.keypoints.size());
 
         // step: 2 database开启并写入
+        // std::cout << "write feat. data into database,,," << std::endl;
         DatabaseTransaction database_transaction(database_);
 
         if (image_data.image.ImageId() == kInvalidImageId) {
@@ -345,6 +356,8 @@ class FeatureWriterThread : public Thread {
         break;
       }
     }
+
+    // std::cout << "exit feature writer thread." << std::endl;
   }
 
   const size_t num_images_;
@@ -365,9 +378,11 @@ class FeatureExtractorController : public Thread {
     THROW_CHECK(reader_options_.Check());
     THROW_CHECK(sift_options_.Check());
 
+    std::cout << "new feature extractor controller,,," << std::endl;
     // step: 1 camera_mask
     std::shared_ptr<Bitmap> camera_mask;
     if (!reader_options_.camera_mask_path.empty()) {
+      std::cout << "load camera_mask,,, " << std::endl;
       camera_mask = std::make_shared<Bitmap>();
       if (!camera_mask->Read(reader_options_.camera_mask_path,
                              /*as_rgb*/ false)) {
@@ -381,6 +396,7 @@ class FeatureExtractorController : public Thread {
     // step: 2 线程资源
     const int num_threads = GetEffectiveNumThreads(sift_options_.num_threads);
     THROW_CHECK_GT(num_threads, 0);
+    std::cout << "num_threads: " << num_threads << std::endl;
 
     // Make sure that we only have limited number of objects in the queue to
     // avoid excess in memory usage since images and features take lots of
@@ -400,10 +416,14 @@ class FeatureExtractorController : public Thread {
                                                  extractor_queue_.get()));
       }
     }
+    std::cout << "resizers size: " << resizers_.size() << std::endl;
 
     // step: 5 特征提取
+    // note: use_gpu就不可以domain_size_pooling或estimate_affine_shape
     if (!sift_options_.domain_size_pooling &&
         !sift_options_.estimate_affine_shape && sift_options_.use_gpu) {
+      std::cout << "sift feat. using gpu,,," << std::endl;
+
       std::vector<int> gpu_indices = CSVToVector<int>(sift_options_.gpu_index);
       THROW_CHECK_GT(gpu_indices.size(), 0);
 
@@ -418,6 +438,8 @@ class FeatureExtractorController : public Thread {
       // step: 5.1 按GPU数量分配
       auto sift_gpu_options = sift_options_;
       for (const auto& gpu_index : gpu_indices) {
+        std::cout << "gpu_index: " << gpu_index << std::endl;
+
         sift_gpu_options.gpu_index = std::to_string(gpu_index);
         extractors_.emplace_back(
             std::make_unique<SiftFeatureExtractorThread>(sift_gpu_options,
@@ -426,6 +448,8 @@ class FeatureExtractorController : public Thread {
                                                          writer_queue_.get()));
       }
     } else {
+      std::cout << "sift feat. using cpu,,," << std::endl;
+
       if (sift_options_.num_threads == -1 &&
           sift_options_.max_image_size ==
               SiftExtractionOptions().max_image_size &&
@@ -505,8 +529,10 @@ class FeatureExtractorController : public Thread {
 
       // step: 2.2 resizer / extractor 处理当前图片
       if (sift_options_.max_image_size > 0) {
+        // std::cout << "resizer_queue_ data + 1" << std::endl;
         THROW_CHECK(resizer_queue_->Push(std::move(image_data)));
       } else {
+        // std::cout << "extractor_queue_ data + 1" << std::endl;
         THROW_CHECK(extractor_queue_->Push(std::move(image_data)));
       }
     }

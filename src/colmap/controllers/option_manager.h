@@ -36,19 +36,19 @@
 #include <boost/program_options.hpp>
 
 namespace colmap {
-
-struct ImageReaderOptions;
-struct SiftExtractionOptions;
-struct SiftMatchingOptions;
-struct TwoViewGeometryOptions;
-struct ExhaustiveMatchingOptions;
-struct SequentialMatchingOptions;
+// note: 提前声明相关参数类
+struct ImageReaderOptions;         // 图像读取参数
+struct SiftExtractionOptions;      // 特征提取参数
+struct SiftMatchingOptions;        // 特征匹配参数
+struct TwoViewGeometryOptions;     // 视图几何参数
+struct ExhaustiveMatchingOptions;  // Exhaustive匹配参数
+struct SequentialMatchingOptions;  // Sequential匹配参数
 struct VocabTreeMatchingOptions;
 struct SpatialMatchingOptions;
 struct TransitiveMatchingOptions;
 struct ImagePairsMatchingOptions;
-struct BundleAdjustmentOptions;
-struct IncrementalMapperOptions;
+struct BundleAdjustmentOptions;   // BA参数
+struct IncrementalMapperOptions;  // incremental建图参数
 struct RenderOptions;
 
 namespace mvs {
@@ -58,6 +58,7 @@ struct PoissonMeshingOptions;
 struct DelaunayMeshingOptions;
 }  // namespace mvs
 
+// api: 参数管理器
 class OptionManager {
  public:
   explicit OptionManager(bool add_project_options = true);
@@ -98,10 +99,12 @@ class OptionManager {
   void AddDelaunayMeshingOptions();
   void AddRenderOptions();
 
+  // api: 添加必需的参数
   template <typename T>
   void AddRequiredOption(const std::string& name,
                          T* option,
                          const std::string& help_text = "");
+  // api: 添加带默认值的参数
   template <typename T>
   void AddDefaultOption(const std::string& name,
                         T* option,
@@ -144,15 +147,19 @@ class OptionManager {
   std::shared_ptr<RenderOptions> render;
 
  private:
+  // api: 添加并注册必需的参数
   template <typename T>
   void AddAndRegisterRequiredOption(const std::string& name,
                                     T* option,
                                     const std::string& help_text = "");
+  
+  // api: 添加并注册带默认值的参数
   template <typename T>
   void AddAndRegisterDefaultOption(const std::string& name,
                                    T* option,
                                    const std::string& help_text = "");
 
+  // api: 向参数表中注册参数
   template <typename T>
   void RegisterOption(const std::string& name, const T* option);
 
@@ -196,6 +203,7 @@ void OptionManager::AddRequiredOption(const std::string& name,
                        boost::program_options::value<T>(option)->required(),
                        help_text.c_str());
 }
+
 
 template <typename T>
 void OptionManager::AddDefaultOption(const std::string& name,

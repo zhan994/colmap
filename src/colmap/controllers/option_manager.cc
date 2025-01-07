@@ -52,6 +52,8 @@ namespace config = boost::program_options;
 namespace colmap {
 
 OptionManager::OptionManager(bool add_project_options) {
+  std::cout << "new option_manager,,," << std::endl;
+
   project_path = std::make_shared<std::string>();
   database_path = std::make_shared<std::string>();
   image_path = std::make_shared<std::string>();
@@ -230,6 +232,8 @@ void OptionManager::AddImageOptions() {
 }
 
 void OptionManager::AddExtractionOptions() {
+  std::cout << "add extraction options,,, " << std::endl;
+
   if (added_extraction_options_) {
     return;
   }
@@ -740,6 +744,8 @@ void OptionManager::AddRenderOptions() {
 }
 
 void OptionManager::Reset() {
+  std::cout << "reset option_manager,,, " << std::endl;
+
   FLAGS_logtostderr = true;
 
   const bool kResetPaths = true;
@@ -839,10 +845,9 @@ bool OptionManager::Check() {
 
 void OptionManager::Parse(const int argc, char** argv) {
   config::variables_map vmap;
-
+  std::cout << "parsing options,,, " << std::endl;
   try {
     config::store(config::parse_command_line(argc, argv, *desc_), vmap);
-
     if (vmap.count("help")) {
       LOG(INFO) << StringPrintf(
           "%s (%s)", GetVersionInfo().c_str(), GetBuildInfo().c_str());
