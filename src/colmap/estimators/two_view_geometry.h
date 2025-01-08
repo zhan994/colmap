@@ -39,8 +39,10 @@
 namespace colmap {
 
 // Estimation options.
+// api: 两视图几何估计参数
 struct TwoViewGeometryOptions {
   // Minimum number of inliers for non-degenerate two-view geometry.
+  // 不退化的最小内点数
   int min_num_inliers = 15;
 
   // In case both cameras are calibrated, the calibration is verified by
@@ -48,6 +50,7 @@ struct TwoViewGeometryOptions {
   // fractions of number of inliers. If the essential matrix produces
   // a similar number of inliers (`min_E_F_inlier_ratio * F_num_inliers`),
   // the calibration is assumed to be correct.
+  // 
   double min_E_F_inlier_ratio = 0.95;
 
   // In case an epipolar geometry can be verified, it is checked whether

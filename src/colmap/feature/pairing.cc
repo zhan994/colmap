@@ -426,6 +426,7 @@ bool SequentialPairGenerator::HasFinished() const {
 }
 
 std::vector<std::pair<image_t, image_t>> SequentialPairGenerator::Next() {
+  // step: 1 清空图像对，并检查当前idx
   image_pairs_.clear();
   if (image_idx_ >= image_ids_.size()) {
     if (vocab_tree_pair_generator_) {
@@ -436,6 +437,7 @@ std::vector<std::pair<image_t, image_t>> SequentialPairGenerator::Next() {
   LOG(INFO) << StringPrintf(
       "Matching image [%d/%d]", image_idx_ + 1, image_ids_.size());
 
+  // step: 2 建立当前idx图像的overlap和quadratic_overlap的图像对
   const auto image_id1 = image_ids_.at(image_idx_);
   for (int i = 0; i < options_.overlap; ++i) {
     const size_t image_idx_2 = image_idx_ + i;

@@ -74,11 +74,14 @@ struct VocabTreeMatchingOptions {
   bool Check() const;
 };
 
+// api: seq_match参数
 struct SequentialMatchingOptions {
   // Number of overlapping image pairs.
+  // 重叠图像对数量
   int overlap = 10;
 
   // Whether to match images against their quadratic neighbors.
+  // 是否对二次近邻图像进行匹配
   bool quadratic_overlap = true;
 
   // Whether to enable vocabulary tree based loop detection.
@@ -249,6 +252,8 @@ class VocabTreePairGenerator : public PairGenerator {
 class SequentialPairGenerator : public PairGenerator {
  public:
   using PairOptions = SequentialMatchingOptions;
+
+  // api: 缓存大小
   static size_t CacheSize(const SequentialMatchingOptions& options) {
     return std::max(5 * options.loop_detection_num_images, 5 * options.overlap);
   }
@@ -266,6 +271,7 @@ class SequentialPairGenerator : public PairGenerator {
   std::vector<std::pair<image_t, image_t>> Next() override;
 
  private:
+  // api: 获取排好顺序的图像id
   std::vector<image_t> GetOrderedImageIds() const;
 
   const SequentialMatchingOptions options_;

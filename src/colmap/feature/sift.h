@@ -134,6 +134,7 @@ struct SiftExtractionOptions {
 std::unique_ptr<FeatureExtractor> CreateSiftFeatureExtractor(
     const SiftExtractionOptions& options);
 
+// api: Sift特征匹配参数
 struct SiftMatchingOptions {
   // Number of threads for feature matching and geometric verification.
   int num_threads = -1;
@@ -146,21 +147,27 @@ struct SiftMatchingOptions {
   std::string gpu_index = "-1";
 
   // Maximum distance ratio between first and second best match.
+  // 最佳和次佳的比例阈值
   double max_ratio = 0.8;
 
   // Maximum distance to best match.
+  // 最佳匹配的最大距离阈值
   double max_distance = 0.7;
 
   // Whether to enable cross checking in matching.
+  // 是否交叉验证
   bool cross_check = true;
 
   // Maximum number of matches.
+  // 最大匹配数
   int max_num_matches = 32768;
 
   // Whether to perform guided matching, if geometric verification succeeds.
+  // 几何位置guide的匹配
   bool guided_matching = false;
 
   // Whether to use brute-force instead of FLANN based CPU matching.
+  // 是否使用cpu的暴力匹配
   bool brute_force_cpu_matcher = false;
 
   bool Check() const;
