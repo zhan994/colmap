@@ -43,7 +43,7 @@
 #include <unordered_map>
 
 namespace colmap {
-
+// api: 特征匹配类，FeatureMatcherWorker的每次Run中实例化
 class FeatureMatcher {
  public:
   virtual ~FeatureMatcher() = default;

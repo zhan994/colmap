@@ -15,7 +15,6 @@ echo "$(log_time) feature extractor ..."
 ./build/src/colmap/exe/colmap feature_extractor \
   --ImageReader.single_camera 1 \
   --ImageReader.camera_model OPENCV \
-  --ImageReader.camera_params ${CAM_PARAM} \
   --SiftExtraction.use_gpu 1 \
   --SiftExtraction.max_image_size 1024 \
   --SiftExtraction.max_num_features 1000 \
@@ -24,7 +23,7 @@ echo "$(log_time) feature extractor ..."
 echo "$(log_time) feature_extractor done."
 
 echo "$(log_time) feature matcher ..."
-./build/src/colmap/exe/colmap exhaustive_matcher \
+./build/src/colmap/exe/colmap sequential_matcher \
   --SiftMatching.use_gpu 1 \
   --database_path ${PROJECT}/database.db
 echo "$(log_time) feature exhaustive_matcher done."

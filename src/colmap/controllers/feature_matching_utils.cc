@@ -148,7 +148,7 @@ std::shared_ptr<FeatureDescriptors> FeatureMatcherWorker::GetDescriptorsPtr(
 
 namespace {
 
-// api: 验证特征匹配线程类
+// api: 验证特征匹配线程类，对极几何计算
 class VerifierWorker : public Thread {
  public:
   typedef FeatureMatcherData Input;
@@ -227,6 +227,7 @@ FeatureMatcherController::FeatureMatcherController(
   THROW_CHECK(matching_options_.Check());
   THROW_CHECK(geometry_options_.Check());
 
+  // step: 1 获取系统资源数量
   const int num_threads = GetEffectiveNumThreads(matching_options_.num_threads);
   THROW_CHECK_GT(num_threads, 0);
 
@@ -243,9 +244,11 @@ FeatureMatcherController::FeatureMatcherController(
   }
 #endif  // COLMAP_CUDA_ENABLED
 
+  // step: 2 分配 matchers
   if (matching_options_.use_gpu) {
     auto matching_options_copy = matching_options_;
     // The first matching is always without guided matching.
+    // step: 2.1 gpu版本
     matching_options_copy.guided_matching = false;
     matchers_.reserve(gpu_indices.size());
     for (const auto& gpu_index : gpu_indices) {
@@ -260,6 +263,7 @@ FeatureMatcherController::FeatureMatcherController(
   } else {
     auto matching_options_copy = matching_options_;
     // The first matching is always without guided matching.
+    // step: 2.2 cpu版本
     matching_options_copy.guided_matching = false;
     matchers_.reserve(num_threads);
     for (int i = 0; i < num_threads; ++i) {
@@ -272,8 +276,10 @@ FeatureMatcherController::FeatureMatcherController(
     }
   }
 
+  // step: 3 分配 verifiers
   verifiers_.reserve(num_threads);
   if (matching_options_.guided_matching) {
+    // step: 3.1 guided匹配，将验证verified结果重新传给guided matching
     // Redirect the verification output to final round of guided matching.
     for (int i = 0; i < num_threads; ++i) {
       verifiers_.emplace_back(std::make_unique<VerifierWorker>(
@@ -281,6 +287,7 @@ FeatureMatcherController::FeatureMatcherController(
     }
 
     if (matching_options_.use_gpu) {
+      // step: gpu版本 guided_match
       auto matching_options_copy = matching_options_;
       guided_matchers_.reserve(gpu_indices.size());
       for (const auto& gpu_index : gpu_indices) {
@@ -293,6 +300,7 @@ FeatureMatcherController::FeatureMatcherController(
                                                    &output_queue_));
       }
     } else {
+      // step: cpu版本 guided_match
       guided_matchers_.reserve(num_threads);
       for (int i = 0; i < num_threads; ++i) {
         guided_matchers_.emplace_back(
@@ -304,6 +312,7 @@ FeatureMatcherController::FeatureMatcherController(
       }
     }
   } else {
+    // step: 3.2 直接输出verified结果
     for (int i = 0; i < num_threads; ++i) {
       verifiers_.emplace_back(std::make_unique<VerifierWorker>(
           geometry_options_, cache, &verifier_queue_, &output_queue_));
@@ -392,6 +401,7 @@ void FeatureMatcherController::Match(
   THROW_CHECK_NOTNULL(cache_);
   THROW_CHECK(is_setup_);
 
+  std::cout << "FeatureMatcherController Match,,," << std::endl;
   if (image_pairs.empty()) {
     return;
   }
@@ -404,13 +414,16 @@ void FeatureMatcherController::Match(
   image_pair_ids.reserve(image_pairs.size());
 
   size_t num_outputs = 0;
+  // step: 1 逐个遍历image_pair
   for (const auto& image_pair : image_pairs) {
     // Avoid self-matches.
+    // step: 1.1 防止自匹配
     if (image_pair.first == image_pair.second) {
       continue;
     }
 
     // Avoid duplicate image pairs.
+    // step: 1.2 防止有重复的pair_id
     const image_pair_t pair_id =
         Database::ImagePairToPairId(image_pair.first, image_pair.second);
     if (image_pair_ids.count(pair_id) > 0) {
@@ -419,6 +432,7 @@ void FeatureMatcherController::Match(
 
     image_pair_ids.insert(pair_id);
 
+    // step: 1.3 判断是否已存在处理过的该pair
     const bool exists_matches =
         cache_->ExistsMatches(image_pair.first, image_pair.second);
     const bool exists_inlier_matches =
@@ -434,7 +448,7 @@ void FeatureMatcherController::Match(
     // from scratch and delete the existing results. This must be done before
     // pushing the jobs to the queue, otherwise database constraints might fail
     // when writing an existing result into the database.
-
+    // step: 1.4 没有matches和inlier matches同时存在，即删除已有结果重新计算
     if (exists_inlier_matches) {
       cache_->DeleteInlierMatches(image_pair.first, image_pair.second);
     }
@@ -443,6 +457,7 @@ void FeatureMatcherController::Match(
     data.image_id1 = image_pair.first;
     data.image_id2 = image_pair.second;
 
+    // step: 1.5 matches存在重新计算verification的对极几何，否则正常计算
     if (exists_matches) {
       data.matches = cache_->GetMatches(image_pair.first, image_pair.second);
       cache_->DeleteMatches(image_pair.first, image_pair.second);
@@ -455,7 +470,7 @@ void FeatureMatcherController::Match(
   //////////////////////////////////////////////////////////////////////////////
   // Write results to database
   //////////////////////////////////////////////////////////////////////////////
-
+  // step: 2 写入数据库
   for (size_t i = 0; i < num_outputs; ++i) {
     auto output_job = output_queue_.Pop();
     THROW_CHECK(output_job.IsValid());

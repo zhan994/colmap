@@ -1590,8 +1590,12 @@ DatabaseTransaction::DatabaseTransaction(Database* database)
     : database_(database), database_lock_(database->transaction_mutex_) {
   THROW_CHECK_NOTNULL(database_);
   database_->BeginTransaction();
+  // std::cout << "database start transaction,,," << std::endl;
 }
 
-DatabaseTransaction::~DatabaseTransaction() { database_->EndTransaction(); }
+DatabaseTransaction::~DatabaseTransaction() {
+  database_->EndTransaction();
+  // std::cout << "database end transaction." << std::endl;
+}
 
 }  // namespace colmap

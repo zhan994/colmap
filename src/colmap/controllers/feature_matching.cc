@@ -89,11 +89,14 @@ class GenericFeatureMatcher : public Thread {
       }
       Timer timer;
       timer.Start();
+
       // step: 3.1 获取图像对数据列表
       const std::vector<std::pair<image_t, image_t>> image_pairs =
           pair_generator.Next();
+
       DatabaseTransaction database_transaction(database_.get());
-      // step: 3.2 特征匹配控制器进行Match
+      
+      // step: 3.2 特征匹配控制器 进行 Match
       matcher_.Match(image_pairs);
       PrintElapsedTime(timer);
     }
@@ -103,7 +106,7 @@ class GenericFeatureMatcher : public Thread {
   const typename DerivedPairGenerator::PairOptions pair_options_;
   const std::shared_ptr<Database> database_;
   const std::shared_ptr<FeatureMatcherCache> cache_;
-  FeatureMatcherController matcher_; // 特征匹配控制器
+  FeatureMatcherController matcher_;  // 特征匹配控制器
 };
 
 }  // namespace

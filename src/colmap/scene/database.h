@@ -199,7 +199,7 @@ class Database {
   void WriteKeypoints(image_t image_id,
                       const FeatureKeypoints& keypoints) const;
   void WriteKeypoints(image_t image_id, const FeatureKeypointsBlob& blob) const;
-  
+
   // api: 写desc.
   void WriteDescriptors(image_t image_id,
                         const FeatureDescriptors& descriptors) const;
@@ -381,6 +381,8 @@ class Database {
 // api: 数据库处理类，自动管理开始与结束
 class DatabaseTransaction {
  public:
+  // api: 需要操作数据库时，实例化该对象
+  // note: 一般在循环体内创建临时变量再自动释放并结束操作数据库
   explicit DatabaseTransaction(Database* database);
   ~DatabaseTransaction();
 
