@@ -24,8 +24,9 @@ echo "$(log_time) convert protobuf to images ..."
 python3 work/python/extract_images.py ${PROTOBUF_PATH} ${IMAGE}
 
 echo "$(log_time) feature matcher ..."
-./build/src/colmap/exe/colmap exhaustive_matcher \
+./build/src/colmap/exe/colmap sequential_matcher \
   --SiftMatching.use_gpu 1 \
+  --SequentialMatching.overlap 10 \
   --database_path ${PROJECT}/database.db
 echo "$(log_time) feature exhaustive_matcher done."
 
