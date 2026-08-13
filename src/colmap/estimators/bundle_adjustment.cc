@@ -466,7 +466,8 @@ void FixGaugeWithThreePoints(
 
   // First check if we already fixed enough points in the problem.
   for (const auto& [point3D_id, num_observations] : point3D_num_observations) {
-    const Point3D& point3D = reconstruction.Point3D(point3D_id);
+    // const Point3D& point3D = reconstruction.Point3D(point3D_id);
+    Point3D& point3D = reconstruction.Point3D(point3D_id);
     if (problem.IsParameterBlockConstant(point3D.xyz.data()) &&
         fixed_gauge.MaybeAddFixedPoint(point3D.xyz) &&
         fixed_gauge.num_fixed_points >= 3) {
