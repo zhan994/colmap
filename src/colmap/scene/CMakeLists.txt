@@ -62,7 +62,7 @@ COLMAP_ADD_LIBRARY(
         colmap_geometry
         colmap_util
         Eigen3::Eigen
-        SQLite3::SQLite3
+        SQLite::SQLite3
 )
 
 if(TESTS_ENABLED)
