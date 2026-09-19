@@ -31,6 +31,20 @@ cmake .. -GNinja -DGPU_ARCH=120 # -DGPU_ARCH=120 (50x0), 89 (40x0), or 86 (30x0)
 ninja
 ```
 
+## Run
+
+```bash
+# prepare images data in `proj/images_raw/`, abd remove rotation in EXIF
+python3 work/python/rm_exif_rot.py proj/images_raw/ proj/images/
+
+# auto calibration for intrinsics using gps info.
+./work/shell/auto_calib_gps.sh
+
+# sfm using camera intrinsics (see `proj/calib/sparse/valid/camera.txt`) and gps info.
+./work/shell/sfm_cam_gps.sh fx,fy,cx,cy,k1,k2,p1,p2
+```
+
+
 
 COLMAP
 ======
