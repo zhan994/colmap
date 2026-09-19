@@ -27,6 +27,7 @@ if __name__ == "__main__":
     images_txt_path = sys.argv[1]
     input_folder = sys.argv[2]
     percent = valid_percent(images_txt_path, input_folder)
+    print(f"Valid percent: {percent:.2f}%")
     if percent > 75.0:
         sys.exit(0)
     else:

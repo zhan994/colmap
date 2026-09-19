@@ -1,3 +1,37 @@
+# Quick Start
+
+```bash
+sudo apt-get install \
+    git \
+    cmake \
+    ninja-build \
+    build-essential \
+    libboost-program-options-dev \
+    libboost-filesystem-dev \
+    libboost-graph-dev \
+    libboost-system-dev \
+    libeigen3-dev \
+    libflann-dev \
+    libfreeimage-dev \
+    libmetis-dev \
+    libgoogle-glog-dev \
+    libgtest-dev \
+    libsqlite3-dev \
+    libglew-dev \
+    qtbase5-dev \
+    libqt5opengl5-dev \
+    libcgal-dev \
+    libceres-dev
+    
+git clone -b dev_3.10 git@github.com:zhan994/colmap.git
+cd colmap
+mkdir build
+cd build
+cmake .. -GNinja -DGPU_ARCH=120 # -DGPU_ARCH=120 (50x0), 89 (40x0), or 86 (30x0)
+ninja
+```
+
+
 COLMAP
 ======
 
