@@ -33,16 +33,30 @@ ninja
 
 ## Run
 
+Run three steps as shown below:
+
 ```bash
-# prepare images data in `proj/images_raw/`, abd remove rotation in EXIF
+# Prepare images data in `proj/images_raw/`, abd remove rotation in EXIF
 python3 work/python/rm_exif_rot.py proj/images_raw/ proj/images/
 
-# auto calibration for intrinsics using gps info.
+# Auto calibration for intrinsics using GPS info.
 ./work/shell/auto_calib_gps.sh
 
-# sfm using camera intrinsics (see `proj/calib/sparse/valid/camera.txt`) and gps info.
+# SfM using camera intrinsics (see `proj/calib/sparse/valid/cameras.txt`) and GPS info.
 ./work/shell/sfm_cam_gps.sh fx,fy,cx,cy,k1,k2,p1,p2
 ```
+
+Alternatively, run all three steps automatically:
+
+```bash
+# Prepare images in `proj/images_raw/`, then run all three steps automatically:
+# normalize EXIF orientation, calibrate intrinsics using GPS, and run GPS-aligned SfM.
+#
+# Note: The script reads `fx,fy,cx,cy,k1,k2,p1,p2` from `proj/calib/sparse/valid/cameras.txt` 
+# and passes them to `sfm_cam_gps.sh`. Calibration must produce one shared OPENCV camera.
+./work/shell/sfm_cam_gps_auto_calib.sh
+```
+
 
 
 
